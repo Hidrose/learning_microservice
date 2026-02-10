@@ -1,0 +1,17 @@
+FROM node:20
+
+WORKDIR /app
+
+ARG VITE_BACKEND_URL
+
+COPY ./package*.json ./
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+EXPOSE 5173
+
+CMD [ "npm", "run", "preview", "--", "--port", "5173", "--host", "0.0.0.0" ]

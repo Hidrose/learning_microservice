@@ -1,0 +1,194 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [dev, main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: ./frontend/package-lock.json
+
+      - name: Install deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Lint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
+  test-backend:
+    runs-on: ubuntu-latest
+
+    env:
+      SPRING_PROFILES_ACTIVE: test
+
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - eureka-server
+          - api-gateway
+          - assistant-service
+          - user-service
+          - auth-service
+          - product-service
+          - category-service
+          - brand-service
+          - order-service
+          - payment-service
+          - cart-service
+          - chat-service
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Build & test ${{ matrix.service }}
+        working-directory: backend/${{ matrix.service }}
+        run: mvn clean verify
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    needs: test-frontend
+    if: ${{ github.ref == 'refs/heads/main' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy frontend
+        run: |
+          curl -X POST "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}"
+
+  create_issue:
+    runs-on: ubuntu-latest
+    needs:
+      - test-frontend
+      - test-backend
+      - deploy-frontend
+    if: failure()
+    permissions:
+      issues: write
+
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const branch = context.ref.replace('refs/heads/', '');
+            const title = `FAILURE: CI/CD Pipeline Failed on branch ${branch}`;
+
+            const body = `
+            **CI/CD Pipeline Failed**
+
+            **Branch:** \`${branch}\`
+            **Commit:** \`${context.sha}\`
+
+            | Job | Result |
+            |-----|--------|
+            | Test frontend | ${{ needs.test-frontend.result }} |
+            | Test backend | ${{ needs.test-backend.result }} |
+            | Deploy frontend | ${{ needs.deploy-frontend.result || 'skipped' }} |
+
+            **Workflow Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}
+
+            *Created automatically by GitHub Actions.*
+            `;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ['bug', 'ci/cd-failure'],
+              assignees: [context.actor]
+            });
+
+  close_issue_test:
+    runs-on: ubuntu-latest
+    needs: [test-frontend, test-backend]
+    if: needs.test-frontend.result == 'success' && needs.test-backend.result == 'success'
+    permissions:
+      issues: write
+
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = `FAILURE: CI/CD Pipeline Failed on branch ${context.ref.replace('refs/heads/', '')}`;
+            const results = await github.rest.search.issuesAndPullRequests({
+              q: `is:open repo:${context.repo.owner}/${context.repo.repo} in:title "${title}" label:ci/cd-failure`,
+            });
+
+            for (const issue of results.data.items) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `Test job has passed. Closing CI/CD failure issue.`,
+              });
+
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed',
+              });
+            }
+
+  close_issue_deploy:
+    runs-on: ubuntu-latest
+    needs: [deploy-frontend]
+    if: needs.deploy-frontend.result == 'success'
+    permissions:
+      issues: write
+
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = `FAILURE: CI/CD Pipeline Failed on branch ${context.ref.replace('refs/heads/', '')}`;
+            const results = await github.rest.search.issuesAndPullRequests({
+              q: `is:open repo:${context.repo.owner}/${context.repo.repo} in:title "${title}" label:ci/cd-failure`,
+            });
+
+            for (const issue of results.data.items) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `Deploy job has passed. Closing CI/CD failure issue.`,
+              });
+
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed',
+              });
+            }

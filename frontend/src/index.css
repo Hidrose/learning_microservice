@@ -1,0 +1,299 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap");
+@import "tailwindcss";
+* {
+  scroll-behavior: smooth;
+  font-family: "Quicksand", sans-serif;
+}
+
+body {
+  color: #444;
+}
+
+.custom-scroll::-webkit-scrollbar {
+  width: 0px;
+}
+
+a,
+img {
+  display: block;
+}
+
+button {
+  cursor: pointer;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.swiper-pagination-bullet {
+  background-color: #333 !important;
+  opacity: 1 !important;
+}
+.swiper-pagination-bullet-active {
+  background-color: #FF4C58 !important;
+}
+
+.apexcharts-toolbar {
+  z-index: 2 !important;
+}
+
+h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+h4 {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+h5 {
+  font-size: 1rem;
+}
+
+p,
+span {
+  font-size: 0.9rem;
+}
+
+.prose {
+  table {
+    border-collapse: collapse;
+    margin: 0 auto;
+    table-layout: auto;
+    text-align: left;
+    width: auto;
+  }
+
+  table tr {
+    p,
+    h1,
+    h2,
+    h3,
+    h4 {
+      margin-bottom: 0;
+    }
+  }
+
+  .tableWrapper {
+    margin-bottom: 1em;
+  }
+
+  .selectedCell:after {
+    background-color: rgba(181, 214, 253, 0.5);
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .column-resize-handle {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: #377dff;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  &.resize-cursor {
+    cursor: ew-resize;
+    cursor: col-resize;
+  }
+
+  td,
+  th {
+    border: 1px solid #d1d5dc;
+    box-sizing: border-box;
+    min-width: 80px;
+    padding: 6px;
+    position: relative;
+    vertical-align: top;
+
+    > * {
+      margin-bottom: 0;
+    }
+  }
+
+  th {
+    background-color: #eeeeee;
+  }
+
+  hr {
+    margin-bottom: 0.8em;
+    border-color: #d1d5dc;
+  }
+
+  li {
+    margin-bottom: 0.6em;
+  }
+
+  li::marker {
+    font-weight: bold;
+  }
+
+  ol {
+    list-style-type: decimal;
+    margin-left: 30px;
+    font-size: 0.9rem;
+    margin-bottom: 0.8em;
+  }
+
+  ul {
+    list-style-type: disc;
+    margin-left: 30px;
+    font-size: 0.9rem;
+    margin-bottom: 0.8em;
+  }
+
+  blockquote {
+    border-left: 4px solid #d1d5dc;
+    margin-right: 5rem;
+    padding-left: 1rem;
+    margin-bottom: 0.8em;
+  }
+
+  p {
+    margin-bottom: 0.8em;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin-bottom: 0.6em;
+  }
+
+  p,
+  h1,
+  h2,
+  h3,
+  h4 {
+    line-height: 28px;
+  }
+
+  a {
+    display: inline;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #158ed4;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+.main-prose {
+  table {
+    border-collapse: collapse;
+    margin: 0 auto;
+    table-layout: auto;
+    text-align: left;
+    margin-bottom: 1em;
+  }
+
+  table tr {
+    p,
+    h1,
+    h2,
+    h3,
+    h4 {
+      margin-bottom: 0;
+    }
+  }
+
+  td,
+  th {
+    border: 1px solid #d1d5dc;
+    box-sizing: border-box;
+    min-width: 80px;
+    padding: 6px;
+    position: relative;
+    vertical-align: top;
+
+    > * {
+      margin-bottom: 0;
+    }
+  }
+
+  th {
+    background-color: #eeeeee;
+  }
+
+  hr {
+    margin-bottom: 0.8em;
+    border-color: #d1d5dc;
+  }
+
+  li {
+    margin-bottom: 0.6em;
+  }
+
+  li::marker {
+    font-weight: bold;
+  }
+
+  ol {
+    list-style-type: decimal;
+    margin-left: 30px;
+    font-size: 0.9rem;
+    margin-bottom: 0.8em;
+  }
+
+  ul {
+    list-style-type: disc;
+    margin-left: 30px;
+    font-size: 0.9rem;
+    margin-bottom: 0.8em;
+  }
+
+  blockquote {
+    border-left: 4px solid #d1d5dc;
+    margin-right: 5rem;
+    padding-left: 1rem;
+    margin-bottom: 0.8em;
+  }
+
+  p {
+    margin-bottom: 0.8em;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin-bottom: 0.6em;
+  }
+
+  p,
+  h1,
+  h2,
+  h3,
+  h4 {
+    line-height: 28px;
+  }
+
+  a {
+    display: inline;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #158ed4;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
