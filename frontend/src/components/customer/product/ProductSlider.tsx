@@ -4,7 +4,8 @@ import "swiper/css/free-mode";
 import { FreeMode } from "swiper/modules";
 import ProductCard from "./ProductCard";
 import type { ProductResponse } from "../../../types/type";
-import ProductCardSkeleton from "../skeleton/ProductCardSkeleton";
+import { memo } from "react";
+import ProductSliderSkeleton from "../skeleton/ProductSliderSkeleton";
 
 interface Props {
   title: string;
@@ -12,46 +13,44 @@ interface Props {
   products: ProductResponse[];
 }
 
-function ProductSlider({ title, isLoading, products }: Props) {
+function ProductSlider({ title, isLoading = false, products }: Props) {
   return (
     <>
       <section className="mb-[40px] px-[15px] text-black">
         <div className="mx-auto max-w-[1200px] w-full">
+          <h2 className="mb-[20px]">{title}</h2>
           {isLoading ? (
-            <ProductCardSkeleton count={4} />
+            <ProductSliderSkeleton count={4} />
           ) : (
             products.length > 0 && (
-              <>
-                <h2 className="mb-[20px]">{title}</h2>
-                <Swiper
-                  spaceBetween={10}
-                  modules={[FreeMode]}
-                  freeMode={true}
-                  grabCursor={true}
-                  breakpoints={{
-                    0: {
-                      slidesPerView: 2,
-                    },
-                    768: {
-                      slidesPerView: 3,
-                    },
-                    1024: {
-                      slidesPerView: 4,
-                    },
-                    1640: {
-                      slidesPerView: 4,
-                    },
-                  }}
-                >
-                  {products.map((product) => {
-                    return (
-                      <SwiperSlide key={product.id}>
-                        <ProductCard product={product} />
-                      </SwiperSlide>
-                    );
-                  })}
-                </Swiper>
-              </>
+              <Swiper
+                spaceBetween={10}
+                modules={[FreeMode]}
+                freeMode={true}
+                grabCursor={true}
+                breakpoints={{
+                  0: {
+                    slidesPerView: 2,
+                  },
+                  768: {
+                    slidesPerView: 3,
+                  },
+                  1024: {
+                    slidesPerView: 4,
+                  },
+                  1640: {
+                    slidesPerView: 4,
+                  },
+                }}
+              >
+                {products.map((product) => {
+                  return (
+                    <SwiperSlide key={product.id}>
+                      <ProductCard product={product} />
+                    </SwiperSlide>
+                  );
+                })}
+              </Swiper>
             )
           )}
         </div>
@@ -60,4 +59,4 @@ function ProductSlider({ title, isLoading, products }: Props) {
   );
 }
 
-export default ProductSlider;
+export default memo(ProductSlider);

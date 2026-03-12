@@ -9,10 +9,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.backend.product_service.config.InternalFeignConfig;
 import com.backend.product_service.dto.response.BrandResponse;
 
-@FeignClient(name = "brand-service", configuration = InternalFeignConfig.class)
+@FeignClient(name = "brand-service")
 public interface BrandServiceClient {
 
     @GetMapping("/api/brand/internal/{id}")

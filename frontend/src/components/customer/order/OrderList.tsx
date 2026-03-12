@@ -1,9 +1,9 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import Image from "../../Image";
-import Loading from "../../Loading";
-import Pagination from "../Pagination";
+import Image from "../../ui/Image";
+import Pagination from "../ui/Pagination";
 import OrderCard from "./OrderCard";
 import useGetOrders from "../../../hooks/customer/order/useGetOrders";
+import OrderListSkeleton from "../skeleton/OrderListSkeleton";
 
 function OrderList() {
   const [searchParams] = useSearchParams();
@@ -56,7 +56,7 @@ function OrderList() {
 
       <div className="flex gap-5 flex-col">
         {isLoading ? (
-          <Loading height={60} size={50} color="black" thickness={3} />
+          <OrderListSkeleton count={2} />
         ) : orders.length > 0 ? (
           orders.map((order) => <OrderCard order={order} />)
         ) : (

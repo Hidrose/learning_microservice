@@ -22,7 +22,7 @@ public class Cart {
     @Id
     private String id;
 
-    @Indexed
+    @Indexed(unique = true)
     private String userId;
 
     private List<CartItem> items;

@@ -6,9 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import com.backend.category_service.config.InternalFeignConfig;
-
-@FeignClient(name = "product-service", configuration = InternalFeignConfig.class)
+@FeignClient(name = "product-service")
 public interface ProductServiceClient {
     @GetMapping("/api/product/internal/exist/category/{categoryId}")
     Boolean existsProductByCategoryIdInternal(@PathVariable String categoryId);

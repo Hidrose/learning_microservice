@@ -2,7 +2,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { useInputImage } from "../../../hooks/admin/useInputImage";
-import InputImage from "../InputImage";
+import InputImage from "../ui/InputImage";
 import useAddCategory from "../../../hooks/admin/category/useAddCategory";
 
 function AddCategory() {

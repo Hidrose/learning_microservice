@@ -1,10 +1,10 @@
 import { GrNext, GrPrevious } from "react-icons/gr";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
-import Image from "../../../Image";
+import Image from "../../../ui/Image";
 import { memo, useEffect, useState } from "react";
 import type { ImageProductResponse } from "../../../../types/type";
-import ImageViewer from "../../../ImageViewer";
+import ImageViewer from "../../../ui/ImageViewer";
 
 type Props = {
   images: ImageProductResponse[];
@@ -71,7 +71,7 @@ function ProductGallery({ images }: Props) {
           {images.map((image, index) => (
             <SwiperSlide
               key={index}
-              className="!w-[70px] !h-[90px] cursor-pointer flex-shrink-0"
+              className="!w-[70px] !h-[70px] cursor-pointer flex-shrink-0"
               onMouseEnter={() => {
                 setMainImage(image.image);
                 setCurrentImageIndex(index);
@@ -109,7 +109,7 @@ function ProductGallery({ images }: Props) {
             <button
               type="button"
               onClick={handleNextImage}
-              className="absolute border right-1.5 top-1/2 w-10 h-10 bg-white rounded-full flex justify-center items-center -translate-y-1/2 z-10 p-2 lg:opacity-0 lg:group-hover:opacity-100 transition duration-300 hover:bg-[#FF4C58] hover:text-white"
+              className="absolute border right-1.5 top-1/2 w-10 h-10 bg-white rounded-full flex justify-center items-center -translate-y-1/2 z-10 p-2 lg:opacity-0 lg:group-hover:opacity-100 transition duration-300 hover:bg-accent hover:text-white"
             >
               <GrNext size={20} />
             </button>
@@ -126,7 +126,7 @@ function ProductGallery({ images }: Props) {
             <button
               type="button"
               onClick={handlePrevImage}
-              className="absolute left-1.5 top-1/2 w-10 h-10 border bg-white rounded-full flex justify-center items-center -translate-y-1/2 z-10 p-2 lg:opacity-0 lg:group-hover:opacity-100 transition duration-300 hover:bg-[#FF4C58] hover:text-white"
+              className="absolute left-1.5 top-1/2 w-10 h-10 border bg-white rounded-full flex justify-center items-center -translate-y-1/2 z-10 p-2 lg:opacity-0 lg:group-hover:opacity-100 transition duration-300 hover:bg-accent hover:text-white"
             >
               <GrPrevious size={20} />
             </button>

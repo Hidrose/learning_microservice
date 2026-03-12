@@ -42,7 +42,7 @@ public final class ProductMapper {
                         product.setSpecifications(
                                         request.getSpecifications().stream()
                                                         .map(SpecificationMapper::toEntity)
-                                                        .toList());
+                                                        .collect(Collectors.toSet()));
                 }
 
                 return product;
@@ -58,14 +58,6 @@ public final class ProductMapper {
                 product.setStock(request.getStock());
                 product.setCategoryId(request.getCategoryId());
                 product.setBrandId(request.getBrandId());
-
-                if (request.getSpecifications() != null) {
-                        product.getSpecifications().clear();
-                        product.getSpecifications().addAll(
-                                        request.getSpecifications().stream()
-                                                        .map(SpecificationMapper::toEntity)
-                                                        .toList());
-                }
         }
 
         public static ProductResponse toResponse(Product product) {

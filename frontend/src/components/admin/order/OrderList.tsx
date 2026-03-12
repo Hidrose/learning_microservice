@@ -1,25 +1,16 @@
 import { LiaExternalLinkAltSolid } from "react-icons/lia";
-import Image from "../../Image";
-import Pagination from "../Pagination";
-import FilterDropDownMenu from "../FilterDropDownMenu";
-import InputSearch from "../InputSearch";
-import Loading from "../../Loading";
-import {
-  Link,
-  useLocation,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
+import Image from "../../ui/Image";
+import Pagination from "../ui/Pagination";
+import FilterDropDownMenu from "../ui/FilterDropDownMenu";
+import InputSearch from "../ui/InputSearch";
+import Loading from "../../ui/Loading";
+import { Link } from "react-router-dom";
 import ListHeader from "../list/ListHeader";
 import ListBody from "../list/ListBody";
 import useGetOrders from "../../../hooks/admin/order/useGetOrders";
 import useUpdateStatusOrder from "../../../hooks/admin/order/useUpdateStatusOrder";
 import toast from "react-hot-toast";
 function OrderList() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [searchParams] = useSearchParams();
-
   const {
     orders,
     isLoading,
@@ -56,61 +47,13 @@ function OrderList() {
     { name: "Trả hàng", value: 5 },
   ];
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-
-    const start = formData.get("start") as string;
-    const end = formData.get("end") as string;
-
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (start) params.set("start", start);
-    else params.delete("start");
-
-    if (end) params.set("end", end);
-    else params.delete("end");
-
-    navigate(`${location.pathname}?${params.toString()}`);
-  };
-
   return (
     <>
-      <ListHeader title="Đơn hàng" totalItems={totalItems} />
-
-      <div className="py-[1.3rem] px-[1.2rem] bg-[#f1f4f9]">
-        <form onSubmit={handleSubmit}>
-          <div className="flex gap-[15px] flex-wrap">
-            <div className="relative flex gap-1.5 items-center">
-              <label htmlFor="" className="text-[0.9rem]   font-medium">
-                Từ:
-              </label>
-              <input
-                required
-                name="start"
-                type="date"
-                className="bg-gray-50 border border-gray-300 text-[0.9rem] p-[6px_10px] outline-none focus:border-gray-400  "
-              />
-            </div>
-
-            <div className="relative flex gap-1.5 items-center">
-              <label htmlFor="" className="text-[0.9rem]   font-medium">
-                Đến:
-              </label>
-              <input
-                required
-                name="end"
-                type="date"
-                className="bg-gray-50 border border-gray-300 text-[0.9rem] p-[6px_10px] outline-none focus:border-gray-400  "
-              />
-            </div>
-
-            <button className="p-[6px_10px] text-[0.9rem] bg-blue-500 text-white">
-              Tìm kiếm
-            </button>
-          </div>
-        </form>
-      </div>
+      <ListHeader
+        title="Đơn hàng"
+        totalItems={totalItems}
+        showDateFilter={true}
+      />
 
       <ListBody>
         <div className="p-[1.2rem]">
@@ -126,15 +69,15 @@ function OrderList() {
               <th className="p-[1rem]  ">Người đặt</th>
               <th className="p-[1rem]  ">Thanh toán</th>
               <th className="p-[1rem]  ">Tổng tiền</th>
-              <th className="p-[1rem]  ">Ngày tạo</th>
-              <th className="p-[1rem]   relative">
+              <th className="p-[1rem]">Ngày tạo</th>
+              <th className="p-[1rem] relative">
                 <FilterDropDownMenu
                   title="Tình trạng"
                   array={array}
                   paramName="status"
                 />
               </th>
-              <th className="p-[1rem]  ">Action</th>
+              <th className="p-[1rem]">Hành động</th>
             </tr>
           </thead>
           <tbody>

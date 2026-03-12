@@ -28,5 +28,4 @@ public class UserRequest {
     private String password;
     private String role; // customer | admin
     private Integer status;
-    private String googleId;
 }

@@ -1,6 +1,6 @@
 import { memo, useState, type ReactNode } from "react";
-import Overplay from "../Overplay";
-import Image from "../../Image";
+import Overplay from "../ui/Overplay";
+import Image from "../../ui/Image";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosArrowUp } from "react-icons/io";
 import { TbCategoryPlus } from "react-icons/tb";
@@ -156,7 +156,7 @@ function MenuSide({ menuOpen, onToggleMenu }: Props) {
                         className={`${
                           openMenus[item.key] ||
                           item.children.some((child) => pathname === child.path)
-                            ? "text-blue-500"
+                            ? "text-primary"
                             : "hover:bg-gray-100"
                         } rounded-lg p-3 w-full cursor-pointer flex justify-between items-center`}
                       >
@@ -187,7 +187,7 @@ function MenuSide({ menuOpen, onToggleMenu }: Props) {
                             key={childIndex}
                             className={`rounded-lg w-full cursor-pointer my-[5px] ${
                               pathname === child.path
-                                ? "text-white bg-blue-500"
+                                ? "text-white bg-primary"
                                 : "hover:bg-gray-100"
                             }`}
                           >
@@ -206,7 +206,7 @@ function MenuSide({ menuOpen, onToggleMenu }: Props) {
                       to={item.path}
                       className={`${
                         pathname === item.path
-                          ? "text-white bg-blue-500"
+                          ? "text-white bg-primary"
                           : "hover:bg-gray-100"
                       } rounded-lg p-3 w-full cursor-pointer flex justify-between items-center`}
                     >

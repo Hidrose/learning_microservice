@@ -9,10 +9,12 @@ const fetcher =
     const token =
       type === "admin"
         ? Cookies.get("token-admin")
-        : Cookies.get("token-customer");
+        : type === "customer"
+          ? Cookies.get("token-customer")
+          : null;
 
     if (!token) {
-      throw new Error("Token not found");
+      throw new Error("Token không tìm thấy");
     }
 
     const res = await axios.get<UserResponse>(url, {

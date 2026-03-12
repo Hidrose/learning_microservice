@@ -1,4 +1,4 @@
-import Image from "../../Image";
+import Image from "../../ui/Image";
 import { Link } from "react-router-dom";
 import useGetActiveCategories from "../../../hooks/customer/category/useGetActiveCategories";
 import CategoryListSkeleton from "../skeleton/CategoryListSkeleton";

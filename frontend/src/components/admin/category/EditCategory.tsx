@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useInputImage } from "../../../hooks/admin/useInputImage";
-import InputImage from "../InputImage";
-import Image from "../../Image";
-import ImageViewer from "../../ImageViewer";
+import InputImage from "../ui/InputImage";
+import Image from "../../ui/Image";
+import ImageViewer from "../../ui/ImageViewer";
 import useGetCategory from "../../../hooks/admin/category/useGetCategory";
 import useUpdateCategory from "../../../hooks/admin/category/useUpdateCategory";
 

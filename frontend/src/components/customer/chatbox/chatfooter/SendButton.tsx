@@ -11,7 +11,7 @@ function ChatButton({ textLength }: Props) {
     <button
       disabled={isDisabled}
       className={`w-9 h-9 flex items-center justify-center rounded-full ${
-        isDisabled ? "bg-gray-200 text-gray-500" : "bg-blue-500 text-white"
+        isDisabled ? "bg-gray-200 text-gray-500" : "bg-primary text-white"
       } `}
     >
       <LuSendHorizontal size={18} />

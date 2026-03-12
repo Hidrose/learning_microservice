@@ -5,9 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.backend.payment_service.config.InternalFeignConfig;
-
-@FeignClient(name = "cart-service", configuration = InternalFeignConfig.class)
+@FeignClient(name = "cart-service")
 public interface CartServiceClient {
     @DeleteMapping("/api/cart/internal/clear/{userId}")
     ResponseEntity<Void> clearCartInternal(@PathVariable String userId);

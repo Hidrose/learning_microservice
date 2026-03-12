@@ -26,12 +26,12 @@ const SpecificationEditor = ({
   updateSpecification,
 }: Props) => {
   return (
-    <div className="sm:p-[25px] p-[15px] bg-white rounded-md flex flex-col gap-[25px] w-full">
+    <div className=" bg-white rounded-md flex flex-col gap-[25px] w-full">
       <div className="flex gap-[15px] justify-between items-center">
         <button
           type="button"
           onClick={addSpecification}
-          className="border-0 cursor-pointer text-[0.9rem] font-medium p-[8px_12px] bg-[#E2EDFF] text-blue-500 hover:bg-blue-500 hover:text-white"
+          className="border-0 cursor-pointer text-[0.9rem] font-medium p-[8px_12px] bg-primary text-white"
         >
           Thêm
         </button>

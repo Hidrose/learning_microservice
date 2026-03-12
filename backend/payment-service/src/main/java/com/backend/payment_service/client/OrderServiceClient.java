@@ -9,10 +9,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.backend.payment_service.config.InternalFeignConfig;
 import com.backend.payment_service.dto.response.OrderResponse;
 
-@FeignClient(name = "order-service", configuration = InternalFeignConfig.class)
+@FeignClient(name = "order-service")
 public interface OrderServiceClient {
     @GetMapping("/api/order/internal/code/{orderCode}")
     OrderResponse getOrderByOrderCodeInternal(@PathVariable String orderCode);

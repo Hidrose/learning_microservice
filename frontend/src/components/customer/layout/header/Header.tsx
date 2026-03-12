@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
-import Image from "../../../Image";
+import Image from "../../../ui/Image";
 import SearchDesktop from "./SearchDesktop";
 import ProfileMenu from "./ProfileMenu";
 import { AiOutlineMenu } from "react-icons/ai";
 import { IoSearchOutline } from "react-icons/io5";
 import { AiOutlineUser } from "react-icons/ai";
 import { PiShoppingCart } from "react-icons/pi";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import SearchMobile from "./SearchMobile";
-import Overplay from "../../../Overplay";
+import Overplay from "../../ui/Overplay";
 import MenuMobile from "./MenuMobile";
 import AuthModal from "../auth/AuthModal";
 import useGetCart from "../../../../hooks/customer/cart/useGetCart";
@@ -20,6 +20,14 @@ function Header() {
   const [profileMenuOpen, setProfileMenuOpen] = useState<boolean>(false);
 
   const { cart } = useGetCart();
+
+  const totalQuantity = useMemo(() => {
+    return (
+      cart?.items.reduce((sum, item) => {
+        return sum + (item?.quantity || 0);
+      }, 0) || 0
+    );
+  }, [cart?.items]);
 
   const toggleProfileMenu = useCallback(() => {
     setProfileMenuOpen((prev) => !prev);
@@ -73,7 +81,7 @@ function Header() {
                 onMouseLeave={toggleProfileMenu}
               >
                 <div
-                  className={`flex items-center gap-1 hover:text-white hover:bg-blue-500 px-2 py-1.5 rounded-md group-hover:bg-blue-500 group-hover:text-white`}
+                  className={`flex items-center gap-1 hover:text-white hover:bg-primary px-2 py-1.5 rounded-md group-hover:bg-primary group-hover:text-white`}
                 >
                   <AiOutlineUser size={24} />
                   <span>Tài khoản</span>
@@ -87,12 +95,12 @@ function Header() {
               </div>
 
               <Link to={"/cart"} className="relative">
-                <div className="flex items-center gap-1 hover:text-white hover:bg-blue-500 px-2 py-1.5 rounded-md">
+                <div className="flex items-center gap-1 hover:text-white hover:bg-primary px-2 py-1.5 rounded-md">
                   <div className="relative">
                     <PiShoppingCart size={24} />
 
-                    <small className="absolute flex items-center justify-center top-[-12px] right-[-11px] bg-[#FF4C58] text-white text-[0.7rem] font-medium leading-none  rounded-full w-[20px] h-[20px]">
-                      {cart?.items.length || 0}
+                    <small className="absolute flex items-center justify-center top-[-12px] right-[-11px] bg-accent text-white text-[0.7rem] font-medium leading-none  rounded-full w-[20px] h-[20px]">
+                      {totalQuantity}
                     </small>
                   </div>
 
@@ -123,8 +131,8 @@ function Header() {
               <Link to={"/cart"} className="relative">
                 <PiShoppingCart size={24} />
 
-                <small className="absolute flex items-center justify-center top-[-9px] right-[-11px] bg-[#FF4C58] text-white text-[0.7rem] font-medium leading-none  rounded-full w-[20px] h-[20px]">
-                  {cart?.items.length || 0}
+                <small className="absolute flex items-center justify-center top-[-9px] right-[-11px] bg-accent text-white text-[0.7rem] font-medium leading-none  rounded-full w-[20px] h-[20px]">
+                  {totalQuantity}
                 </small>
               </Link>
 

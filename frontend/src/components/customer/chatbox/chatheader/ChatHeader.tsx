@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from "react";
-import Image from "../../../Image";
-import ToolTip from "../../ToolTip";
+import Image from "../../../ui/Image";
+import ToolTip from "../../ui/ToolTip";
 type Props = {
   onClose: () => void;
   onExpand: () => void;

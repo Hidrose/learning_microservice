@@ -57,9 +57,6 @@ public class User {
     @Column(nullable = false)
     private Integer status;
 
-    @Column(unique = true)
-    private String googleId;
-
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;

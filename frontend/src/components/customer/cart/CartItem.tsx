@@ -1,6 +1,6 @@
 import type { CartItemResponse } from "../../../types/type";
 import { Link } from "react-router-dom";
-import Image from "../../Image";
+import Image from "../../ui/Image";
 import { HiOutlineMinusSmall, HiOutlinePlusSmall } from "react-icons/hi2";
 import { memo } from "react";
 import { useRemoveItemInCart } from "../../../hooks/customer/cart/useRemoveItemInCart";
@@ -53,7 +53,7 @@ function CartItem({ item, userId, mutate }: Props) {
   };
   return (
     <>
-      <div className="w-full relative space-y-[20px]" key={item.id}>
+      <div className="w-full relative space-y-[20px]" key={item.productId}>
         <div className="flex gap-[10px] w-full sm:flex-row flex-col">
           <Link to={`/product/${item.slug}`} className="mx-auto bg-gray-100">
             <div className="w-[200px] h-[200px] overflow-hidden">
@@ -77,12 +77,12 @@ function CartItem({ item, userId, mutate }: Props) {
                       {item.price.toLocaleString("vi-VN")}₫
                     </del>
 
-                    <h5 className="font-medium text-[#FF4C58]">
+                    <h5 className="font-medium text-accent">
                       {(item.price - item.discount).toLocaleString("vi-VN")}₫
                     </h5>
                   </div>
                 ) : (
-                  <h5 className="font-medium text-[#FF4C58]">
+                  <h5 className="font-medium text-accent">
                     {item.price.toLocaleString("vi-VN")}₫
                   </h5>
                 )}
@@ -92,12 +92,12 @@ function CartItem({ item, userId, mutate }: Props) {
                 data-testid="btn-remove"
                 type="button"
                 disabled={isLoadingRemove}
-                onClick={() => handleRemoveItem(item.id)}
+                onClick={() => handleRemoveItem(item.productId)}
                 className="mb-auto"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-5 h-5 cursor-pointer fill-black hover:fill-[#FF4C58] inline-block"
+                  className="w-5 h-5 cursor-pointer fill-black hover:fill-accent inline-block"
                   viewBox="0 0 24 24"
                 >
                   <path
@@ -117,7 +117,7 @@ function CartItem({ item, userId, mutate }: Props) {
                 <button
                   data-testid="btn-decrement"
                   type="button"
-                  onClick={() => handleDecrement(item.id, item.quantity)}
+                  onClick={() => handleDecrement(item.productId, item.quantity)}
                   disabled={item.quantity <= 1 || isLoadingChangeQuantity}
                   className="flex items-center justify-center w-7 h-7 outline-none bg-[#F7F7F7] border-gray-300 border"
                 >
@@ -130,7 +130,7 @@ function CartItem({ item, userId, mutate }: Props) {
                   data-testid="btn-increment"
                   type="button"
                   onClick={() =>
-                    handleIncrement(item.id, item.quantity, item.stock)
+                    handleIncrement(item.productId, item.quantity, item.stock)
                   }
                   disabled={isLoadingChangeQuantity}
                   className="flex items-center justify-center w-7 h-7 outline-none bg-[#F7F7F7] border-gray-300 border"
@@ -139,7 +139,7 @@ function CartItem({ item, userId, mutate }: Props) {
                 </button>
               </div>
 
-              <h5 className="font-medium text-[#FF4C58]">
+              <h5 className="font-medium text-accent">
                 {item.discount > 0
                   ? (
                       (item.price - item.discount) *
@@ -154,7 +154,7 @@ function CartItem({ item, userId, mutate }: Props) {
         <div className="flex gap-2 flex-col">
           {item.stock < item.quantity && (
             <div>
-              <p className="text-[#FF4C58] font-semibold text-center">
+              <p className="text-accent font-semibold text-center">
                 Sản phẩm hiện tại không đủ số lượng. Vui lòng giảm số lượng hoặc
                 xóa sản phẩm khỏi giỏ hàng!
               </p>
@@ -163,7 +163,7 @@ function CartItem({ item, userId, mutate }: Props) {
 
           {item.status === 0 && (
             <div>
-              <p className="text-[#FF4C58] font-semibold text-center">
+              <p className="text-accent font-semibold text-center">
                 Sản phẩm đang tạm ngừng bán. Vui lòng xóa sản phẩm khỏi giỏ
                 hàng!
               </p>

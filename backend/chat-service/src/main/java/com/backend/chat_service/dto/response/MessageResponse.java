@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 public class MessageResponse {
     private String id;
     private String chatId;
-    private boolean isBot;
+    private String role;
     private String content;
-    private List<String> products;
+    private List<ProductSuggestionResponse> products;
     private Map<String, Object> extraData;
     private LocalDateTime createdAt;
 }

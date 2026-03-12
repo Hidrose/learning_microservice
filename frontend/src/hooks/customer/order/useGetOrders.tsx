@@ -2,6 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import useSWR from "swr";
 import type { OrderResponse } from "../../../types/type";
+import { getCookie } from "../../../utils/cookieUtil";
 
 interface ResponseType {
   orders: OrderResponse[];
@@ -9,10 +10,14 @@ interface ResponseType {
   total: number;
 }
 
-const fetcher = (url: string) => axios.get(url).then((res) => res.data);
-
 export default function useGetOrders() {
   const [searchParams] = useSearchParams();
+
+  const token = getCookie("token-customer");
+
+  if (!token) {
+    throw new Error("Vui lòng đăng nhập");
+  }
 
   const page = parseInt(searchParams.get("page") || "1", 10);
   const status = searchParams.get("status");
@@ -24,6 +29,15 @@ export default function useGetOrders() {
   const url = `${
     import.meta.env.VITE_BACKEND_URL
   }/order/user?${query.toString()}`;
+
+  const fetcher = (url: string) =>
+    axios
+      .get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => res.data);
 
   const { data, error, isLoading, mutate } = useSWR<ResponseType>(
     url,

@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from "react";
 import ChatInput from "./ChatInput";
 import ChatVoice from "./ChatVoice";
 import SendButton from "./SendButton";
-import ToolTip from "../../ToolTip";
+import ToolTip from "../../ui/ToolTip";
 
 function ChatFooter() {
   const [textLength, setTextLength] = useState<number>(0);

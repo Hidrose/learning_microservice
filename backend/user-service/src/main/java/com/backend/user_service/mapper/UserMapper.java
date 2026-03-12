@@ -24,7 +24,6 @@ public final class UserMapper {
                 .gender(request.getGender())
                 .role(request.getRole())
                 .status(request.getStatus())
-                .googleId(request.getGoogleId())
                 .build();
     }
 
@@ -71,7 +70,6 @@ public final class UserMapper {
         user.setGender(request.getGender());
         user.setRole(request.getRole());
         user.setStatus(request.getStatus());
-        user.setGoogleId(request.getGoogleId());
 
         if (request.getPassword() != null) {
             user.setPassword(request.getPassword());

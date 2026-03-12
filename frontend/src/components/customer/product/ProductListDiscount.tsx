@@ -1,5 +1,5 @@
-import BreadCrumb from "../BreadCrumb";
-import Pagination from "../Pagination";
+import BreadCrumb from "../ui/BreadCrumb";
+import Pagination from "../ui/Pagination";
 import ProductList from "./ProductList";
 import useGetActiveDiscountProducts from "../../../hooks/customer/product/page/useGetActiveDiscountProduct";
 

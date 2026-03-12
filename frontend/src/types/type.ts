@@ -25,7 +25,6 @@ export interface UserRequest {
   password?: string;
   role?: "customer" | "admin";
   status?: number;
-  googleId?: string;
 }
 
 export interface BrandRequest {
@@ -126,7 +125,6 @@ export interface ProductResponse {
 }
 
 export interface CartItemResponse {
-  id: string;
   productId: string;
   name: string;
   images: string[];

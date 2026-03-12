@@ -1,17 +1,15 @@
-import BreadCrumb from "../../BreadCrumb";
+import BreadCrumb from "../../ui/BreadCrumb";
 import OrderInfo from "./OrderInfo";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
-import SideBar from "../../SideBar";
+import SideBar from "../../ui/SideBar";
 import useGetOrder from "../../../../hooks/customer/order/useGetOrder";
-import useGetAccount from "../../../../hooks/auth/useGetAccount";
 function OrderDetailContainer() {
   const navigate = useNavigate();
   const { code } = useParams();
 
-  const { account } = useGetAccount("customer");
-  const { order, isLoading } = useGetOrder(account?.id || "", code || "");
+  const { order, isLoading } = useGetOrder(code || "");
 
   const array = [
     {

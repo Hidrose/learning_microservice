@@ -1,8 +1,6 @@
 package com.backend.chat_service.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,14 +26,14 @@ public class Message {
     @Indexed
     private String chatId;
 
-    private boolean isBot; // true nếu là trợ lý ảo, false nếu là user
+    private String role; // USER, ASSISTANT
     private String content; // nội dung tin nhắn
 
-    @Builder.Default
-    private List<String> products = new ArrayList<>();
+    private String intent; // ý định của người dùng
 
-    @Builder.Default
-    private Map<String, Object> extraData = new HashMap<>();
+    private List<String> productIds;
+
+    private Map<String, Object> extraData;
 
     @CreatedDate
     private LocalDateTime createdAt;

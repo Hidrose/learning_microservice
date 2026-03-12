@@ -1,11 +1,11 @@
 import { VscTrash } from "react-icons/vsc";
 import { LiaEdit } from "react-icons/lia";
 import { TbLock, TbLockOpen } from "react-icons/tb";
-import Pagination from "../Pagination";
-import FilterDropDownMenu from "../FilterDropDownMenu";
-import Image from "../../Image";
-import Loading from "../../Loading";
-import InputSearch from "../InputSearch";
+import Pagination from "../ui/Pagination";
+import FilterDropDownMenu from "../ui/FilterDropDownMenu";
+import Image from "../../ui/Image";
+import Loading from "../../ui/Loading";
+import InputSearch from "../ui/InputSearch";
 import { Link } from "react-router-dom";
 import ListHeader from "../list/ListHeader";
 import ListBody from "../list/ListBody";

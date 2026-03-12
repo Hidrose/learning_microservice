@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import Image from "../../Image";
+import Image from "../../ui/Image";
 function Footer() {
   return (
     <footer className="bg-gray-50 border-t border-gray-200 px-[15px] text-gray-500">

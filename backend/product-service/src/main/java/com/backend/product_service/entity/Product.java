@@ -13,9 +13,7 @@ import jakarta.persistence.Index;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -86,7 +84,7 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Specification> specifications = new ArrayList<>();
+    private Set<Specification> specifications = new HashSet<>();
 
     @CreatedDate
     @Column(updatable = false)

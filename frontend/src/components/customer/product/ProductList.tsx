@@ -1,8 +1,9 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import type { ProductResponse } from "../../../types/type";
-import Image from "../../Image";
+import Image from "../../ui/Image";
 import ProductCard from "./ProductCard";
-import ProductCardSkeleton from "../skeleton/ProductCardSkeleton";
+import { memo } from "react";
+import ProductListSkeleton from "../skeleton/ProductListSkeleton";
 
 interface Props {
   title?: string;
@@ -11,7 +12,7 @@ interface Props {
   total: number;
 }
 
-function ProductList({ title, products, isLoading, total }: Props) {
+function ProductList({ title, products, isLoading = false, total }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -54,11 +55,14 @@ function ProductList({ title, products, isLoading, total }: Props) {
     <>
       <div className="mb-[40px] space-y-[15px]">
         <div className="flex justify-between items-center flex-wrap gap-[15px]">
-          {!isLoading && (title || search) && (
-            <h2 className=" text-black capitalize">
-              {search ? search : title} ({total})
-            </h2>
-          )}
+          <h2 className="text-black">
+            {isLoading
+              ? "Đang tải sản phẩm..."
+              : search
+                ? `Kết quả cho "${search}"`
+                : title}
+            {!isLoading && ` (${total})`}
+          </h2>
 
           <select
             onChange={handleSortChange}
@@ -74,7 +78,7 @@ function ProductList({ title, products, isLoading, total }: Props) {
         </div>
 
         {isLoading ? (
-          <ProductCardSkeleton count={12} />
+          <ProductListSkeleton count={12} />
         ) : products.length > 0 ? (
           <div
             className={`grid grid-cols-2 gap-x-[10px] gap-y-[35px] lg:grid-cols-3 2xl:grid-cols-4 ${
@@ -95,7 +99,7 @@ function ProductList({ title, products, isLoading, total }: Props) {
                 loading="eager"
               />
 
-              <h4>Không tìm thấy sách nào</h4>
+              <h4>Không tìm thấy sản phẩm nào</h4>
             </div>
           </div>
         )}
@@ -104,4 +108,4 @@ function ProductList({ title, products, isLoading, total }: Props) {
   );
 }
 
-export default ProductList;
+export default memo(ProductList);

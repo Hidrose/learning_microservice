@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import Image from "../../../Image";
+import Image from "../../../ui/Image";
 import MessageAction from "./MessageAction";
 import { memo, useCallback } from "react";
 import MessageProductList from "./MessageProductList";
@@ -38,7 +38,7 @@ function MessageItem({ type, text, products }: props) {
       >
         <div
           className={`inline-block px-4 py-2 rounded-xl break-anywhere whitespace-pre-wrap   ${
-            type === "ai" ? "bg-gray-100 text-black" : "bg-blue-500 text-white"
+            type === "ai" ? "bg-gray-100 text-black" : "bg-primary text-white"
           }
       `}
         >

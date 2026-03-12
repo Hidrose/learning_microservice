@@ -1,5 +1,5 @@
-import BreadCrumb from "../BreadCrumb";
-import SideBar from "../SideBar";
+import BreadCrumb from "../ui/BreadCrumb";
+import SideBar from "../ui/SideBar";
 import AccountForm from "./AccountForm";
 function Account() {
   const array = [

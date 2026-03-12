@@ -68,17 +68,8 @@ public class PaymentController {
 
         return ResponseEntity.ok(momoResponse);
     }
-
-    // internal
-    @PostMapping("/internal")
-    public ResponseEntity<PaymentResponse> createPaymentInternal(
-            @RequestBody PaymentRequest request) {
-
-        return ResponseEntity.ok(
-                paymentService.createPayment(request));
-    }
-
-    @GetMapping("/internal/momo/redirect")
+    
+ @GetMapping("/momo/redirect")
     public ResponseEntity<Void> handleRedirectInternal(
             @RequestParam(required = false) String resultCode,
             @RequestParam(required = false) String orderId,
@@ -97,9 +88,9 @@ public class PaymentController {
             boolean success = momoService.handleSuccessfulPayment(payload);
 
             if (success) {
-                redirectUrl = frontendUrl + "/order-result?status=successful&&orderCode=" + orderId;
+                redirectUrl = frontendUrl + "/order-result?result=successful";
             } else {
-                redirectUrl = frontendUrl + "/order-result?status=fail";
+                redirectUrl = frontendUrl + "/order-result?result=fail";
             }
         } else {
             redirectUrl = frontendUrl + "/";
@@ -107,6 +98,16 @@ public class PaymentController {
 
         return ResponseEntity.status(302).header("Location", redirectUrl).build();
     }
+    // internal
+    @PostMapping("/internal")
+    public ResponseEntity<PaymentResponse> createPaymentInternal(
+            @RequestBody PaymentRequest request) {
+
+        return ResponseEntity.ok(
+                paymentService.createPayment(request));
+    }
+
+   
 
     @PostMapping("/internal/momo/refund/{orderCode}")
     public ResponseEntity<Void> refundMomoByOrderCodeInternal(

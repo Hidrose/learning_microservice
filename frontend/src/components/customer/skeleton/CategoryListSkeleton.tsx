@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 type Props = {
   count: number;
 };
@@ -24,4 +26,4 @@ function CategoryListSkeleton({ count }: Props) {
   );
 }
 
-export default CategoryListSkeleton;
+export default memo(CategoryListSkeleton);

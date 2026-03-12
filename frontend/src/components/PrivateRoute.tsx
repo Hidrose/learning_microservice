@@ -35,7 +35,11 @@ const PrivateRoute = ({
     // kiểm tra token hết hạn
     const isExpired = decoded.exp * 1000 < Date.now();
     if (isExpired) {
-      Cookies.remove("token");
+      if (type === "admin") {
+        Cookies.remove("token-admin");
+      } else {
+        Cookies.remove("token-customer");
+      }
       return <Navigate to={redirectPath} replace />;
     }
 
@@ -46,7 +50,11 @@ const PrivateRoute = ({
 
     return <>{children}</>;
   } catch {
-    Cookies.remove("token");
+    if (type === "admin") {
+      Cookies.remove("token-admin");
+    } else {
+      Cookies.remove("token-customer");
+    }
     return <Navigate to={redirectPath} replace />;
   }
 };

@@ -1,4 +1,4 @@
-import InputImage from "../InputImage";
+import InputImage from "../ui/InputImage";
 import { useCallback, useState } from "react";
 import toast from "react-hot-toast";
 import TextBoxEditor from "../textboxeditor/TextBoxEditor";
@@ -9,6 +9,7 @@ import SpecificationEditor from "./SpecificationEditor";
 import useAddProduct from "../../../hooks/admin/product/useAddProduct";
 import useGetAllCategories from "../../../hooks/admin/category/useGetAllCategories";
 import useGetAllBrands from "../../../hooks/admin/brand/useGetAllBrands";
+import SearchableSelect from "../ui/SearchableSelect";
 
 function AddProduct() {
   const [data, setData] = useState({
@@ -25,6 +26,20 @@ function AddProduct() {
   const { addProduct, isLoading } = useAddProduct();
   const { categories } = useGetAllCategories();
   const { brands } = useGetAllBrands();
+
+  const categoryOptions = categories
+    .filter((c) => c.id)
+    .map((c) => ({
+      value: c.id!,
+      label: c.name,
+    }));
+
+  const brandOptions = brands
+    .filter((b) => b.id)
+    .map((b) => ({
+      value: b.id!,
+      label: b.name,
+    }));
 
   const max = 10;
 
@@ -80,8 +95,25 @@ function AddProduct() {
       return;
     }
 
+    if (data.discount > 0) {
+      if (Math.floor((data.discount / data.price) * 100) < 1) {
+        toast.error("Phần trăm giảm giá phải lớn hơn hoặc bằng 1%");
+        return;
+      }
+    }
+
     if (Number(data.stock) < 0) {
       toast.error("Số lượng hiện có phải lớn hơn hoặc bằng 0");
+      return;
+    }
+
+    if (!data.category) {
+      toast.error("Vui lòng chọn danh mục");
+      return;
+    }
+
+    if (!data.brand) {
+      toast.error("Vui lòng chọn thương hiệu");
       return;
     }
 
@@ -161,39 +193,50 @@ function AddProduct() {
                   <label htmlFor="" className="text-[0.9rem] font-medium">
                     Danh mục
                   </label>
-                  <select
-                    name="category"
-                    required
-                    onChange={handleChange}
+                  <SearchableSelect
+                    options={categoryOptions}
                     value={data.category}
-                    className="border border-gray-300 p-[6px_10px] text-[0.9rem] w-full outline-none focus:border-gray-400  "
-                  >
-                    <option value="">Chọn danh mục</option>
-                    {categories.map((category) => (
-                      <option value={category.id} key={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(val) =>
+                      setData((prev) => ({
+                        ...prev,
+                        category: val,
+                      }))
+                    }
+                    placeholder="Chọn danh mục"
+                  />
                 </div>
 
                 <div className="flex flex-col gap-1 w-full">
                   <label htmlFor="" className="text-[0.9rem] font-medium">
                     Thương hiệu
                   </label>
+                  <SearchableSelect
+                    options={brandOptions}
+                    value={data.brand}
+                    onChange={(val) =>
+                      setData((prev) => ({
+                        ...prev,
+                        brand: val,
+                      }))
+                    }
+                    placeholder="Chọn thương hiệu"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1 w-full">
+                  <label htmlFor="" className="text-[0.9rem] font-medium">
+                    Tình trạng
+                  </label>
                   <select
-                    name="brand"
+                    name="status"
                     required
                     onChange={handleChange}
-                    value={data.brand}
+                    value={data.status}
                     className="border border-gray-300 p-[6px_10px] text-[0.9rem] w-full outline-none focus:border-gray-400  "
                   >
-                    <option value="">Chọn thương hiệu</option>
-                    {brands.map((brand) => (
-                      <option value={brand.id} key={brand.id}>
-                        {brand.name}
-                      </option>
-                    ))}
+                    <option value="">Chọn tình trạng</option>
+                    <option value="0">Ẩn</option>
+                    <option value="1">Hiện</option>
                   </select>
                 </div>
               </div>

@@ -1,8 +1,8 @@
-import Image from "../../Image";
+import Image from "../../ui/Image";
 import { LuArchive, LuCheck, LuStar, LuTruck } from "react-icons/lu";
 import { RiArrowLeftSLine } from "react-icons/ri";
 import { TbCancel } from "react-icons/tb";
-import Loading from "../../Loading";
+import Loading from "../../ui/Loading";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -47,12 +47,12 @@ function OrderDetail() {
   }, [isLoading, order, navigate]);
   return (
     <section className="my-[30px]">
-      <div className="w-full max-w-[800px] mx-auto">
+      <div className="w-full max-w-[800px] mx-auto bg-white">
         <div className="w-full flex-1 border border-gray-300 text-black">
           {isLoading ? (
             <Loading height={70} size={50} color="black" thickness={3} />
           ) : (
-            <div className=" pb-[20px]">
+            <div className="pb-[20px]">
               <div className="flex justify-between px-[20px] py-[20px] border-b border-gray-300">
                 <div className="flex flex-col gap-[8px]">
                   <h4 className="uppercase">Đơn hàng</h4>
@@ -87,13 +87,15 @@ function OrderDetail() {
                   </p>
                 </div>
 
-                <div className="flex flex-col gap-[8px]">
-                  <Link to={"/admin/orders"} className="text-center">
-                    <span className="flex items-center font-semibold text-gray-600">
-                      <RiArrowLeftSLine size={20} /> Trở về
-                    </span>
-                  </Link>
+                <Link to={"/admin/orders"} className="text-center">
+                  <span className="flex items-center font-semibold text-gray-400">
+                    <RiArrowLeftSLine size={20} /> Trở về
+                  </span>
+                </Link>
+              </div>
 
+              <div className="px-[20px]">
+                <div className="flex justify-center w-full py-[20px]">
                   <select
                     name="status"
                     disabled={isLoadingUpdate}
@@ -137,52 +139,52 @@ function OrderDetail() {
                     {order?.status === 5 && <option value="5">Trả hàng</option>}
                   </select>
                 </div>
+
+                {order?.status === 4 ? (
+                  <div className="relative flex items-center justify-center py-[20px] px-[20px] border-b border-gray-300">
+                    <span className="font-semibold text-center text-red-500 flex items-center gap-2">
+                      <TbCancel size={25} /> Đã hủy đơn hàng
+                    </span>
+                  </div>
+                ) : order?.status === 5 ? (
+                  <div className="relative flex items-center justify-center py-[20px] border-b border-gray-300">
+                    <span className="font-semibold text-center text-red-500 flex items-center gap-2">
+                      <TbCancel size={25} /> Đã trả hàng
+                    </span>
+                  </div>
+                ) : (
+                  <div className="relative gap-y-5 grid grid-cols-2 md:grid-cols-4 py-[20px] border-b border-gray-300">
+                    {steps.map((step, index) => {
+                      const isActive = (order?.status ?? -1) >= index;
+                      return (
+                        <div
+                          key={index}
+                          className="flex flex-col items-center relative z-10 bg-white"
+                        >
+                          <div
+                            className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 border-2 ${
+                              isActive
+                                ? "border-green-500 text-green-500"
+                                : "border-gray-400 text-gray-400"
+                            }`}
+                          >
+                            {step.icon}
+                          </div>
+                          <span
+                            className={`font-medium text-center ${
+                              isActive ? " text-green-500" : ""
+                            }`}
+                          >
+                            {step.label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
-              {order?.status === 4 ? (
-                <div className="relative flex items-center justify-center py-[20px] px-[20px] border-b border-gray-300">
-                  <span className="font-semibold text-center text-red-500 flex items-center gap-2">
-                    <TbCancel size={25} /> Đã hủy đơn hàng
-                  </span>
-                </div>
-              ) : order?.status === 5 ? (
-                <div className="relative flex items-center justify-center py-[20px] px-[20px] border-b border-gray-300">
-                  <span className="font-semibold text-center text-red-500 flex items-center gap-2">
-                    <TbCancel size={25} /> Đã trả hàng
-                  </span>
-                </div>
-              ) : (
-                <div className="relative gap-y-5 grid grid-cols-2 md:grid-cols-4 py-[20px] px-[20px] border-b border-gray-300">
-                  {steps.map((step, index) => {
-                    const isActive = (order?.status ?? -1) >= index;
-                    return (
-                      <div
-                        key={index}
-                        className="flex flex-col items-center relative z-10 bg-white"
-                      >
-                        <div
-                          className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 border-2 ${
-                            isActive
-                              ? "border-green-500 text-green-500"
-                              : "border-gray-400 text-gray-400"
-                          }`}
-                        >
-                          {step.icon}
-                        </div>
-                        <span
-                          className={`font-medium text-center ${
-                            isActive ? " text-green-500" : ""
-                          }`}
-                        >
-                          {step.label}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              <div className="px-[20px]   space-y-[8px] py-[20px]">
+              <div className="px-[20px] space-y-[8px] py-[20px]">
                 <h4 className="uppercase">Thông tin giao hàng</h4>
 
                 <p className="font-medium">

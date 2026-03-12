@@ -82,7 +82,7 @@ function AccountForm() {
                 type="text"
                 name="fullname"
                 className="w-full rounded-sm p-[6px_10px] text-[0.9rem] border border-gray-300  focus:outline-0"
-                value={account?.fullname}
+                value={data?.fullname}
                 onChange={handleChange}
               />
             </div>
@@ -98,7 +98,7 @@ function AccountForm() {
                 type="text"
                 name="email"
                 className="w-full rounded-sm p-[6px_10px] text-[0.9rem] border border-gray-300  focus:outline-0"
-                value={account?.email}
+                value={data?.email}
                 readOnly
               />
             </div>
@@ -132,7 +132,7 @@ function AccountForm() {
                 type="text"
                 name="phone"
                 className="w-full rounded-sm p-[6px_10px] text-[0.9rem] border border-gray-300 focus:outline-0"
-                value={account?.phone}
+                value={data?.phone}
                 onChange={handleChange}
               />
             </div>
@@ -151,7 +151,7 @@ function AccountForm() {
                 <input
                   type="radio"
                   name="gender"
-                  className="scale-140 accent-blue-500"
+                  className="scale-140 accent-primary"
                   value={1}
                   checked={data.gender === 1}
                   onChange={handleChange}
@@ -163,7 +163,7 @@ function AccountForm() {
                 <input
                   type="radio"
                   name="gender"
-                  className="scale-140 accent-blue-500"
+                  className="scale-140 accent-primary"
                   value={0}
                   checked={data.gender === 0}
                   onChange={handleChange}
@@ -177,7 +177,7 @@ function AccountForm() {
             <button
               disabled={isLoading}
               type="submit"
-              className="p-[6px_10px] bg-blue-500 text-white text-[0.9rem] font-medium text-center rounded-sm"
+              className="p-[6px_10px] bg-primary text-white text-[0.9rem] font-medium text-center rounded-sm"
             >
               Lưu thay đổi
             </button>

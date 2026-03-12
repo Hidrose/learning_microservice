@@ -17,8 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Page;
 import com.backend.order_service.dto.request.OrderRequest;
 import com.backend.order_service.dto.response.OrderResponse;
+import com.backend.order_service.exception.BadRequestException;
 import com.backend.order_service.service.OrderService;
-import org.springframework.security.core.Authentication;
+import com.backend.order_service.utils.JwtUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.ForbiddenException;
+
 import org.springframework.validation.annotation.Validated;
 
 @Validated
@@ -26,9 +31,11 @@ import org.springframework.validation.annotation.Validated;
 @RequestMapping("/api/order")
 public class OrderController {
         private final OrderService orderService;
+        private final JwtUtil jwtUtil;
 
-        public OrderController(OrderService orderService) {
+        public OrderController(OrderService orderService, JwtUtil jwtUtil) {
                 this.orderService = orderService;
+                this.jwtUtil = jwtUtil;
         }
 
         // admin
@@ -75,23 +82,22 @@ public class OrderController {
 
         // customer
         @GetMapping("/user/{orderCode}")
-        public ResponseEntity<OrderResponse> getUserOrderByCode(
-                        Authentication auth,
-                        @PathVariable String orderCode) {
+        public ResponseEntity<OrderResponse> getUserOrderByCode(@PathVariable String orderCode,
+                        HttpServletRequest request) {
 
-                String userId = auth.getName();
+                String userId = extractUserIdFromHeader(request);
                 return ResponseEntity.ok(
                                 orderService.getOrderByOrderCodeAndUser(orderCode, userId));
         }
 
         @GetMapping("/user")
         public ResponseEntity<?> getOrdersByUser(
-                        Authentication auth,
                         @RequestParam(defaultValue = "1") int page,
                         @RequestParam(defaultValue = "12") int limit,
-                        @RequestParam(required = false) Integer status) {
+                        @RequestParam(required = false) Integer status,
+                        HttpServletRequest request) {
 
-                String userId = auth.getName();
+                String userId = extractUserIdFromHeader(request);
 
                 Page<OrderResponse> orderPage = orderService.getOrdersByUser(userId, page, limit, status);
 
@@ -104,12 +110,33 @@ public class OrderController {
 
         @PostMapping("/user")
         public ResponseEntity<OrderResponse> createOrder(
-                        @RequestBody OrderRequest request,
-                        Authentication auth) {
+                        @RequestBody OrderRequest order, HttpServletRequest request) {
 
-                String userId = auth.getName();
+                String userId = extractUserIdFromHeader(request);
                 return ResponseEntity.ok(
-                                orderService.createOrder(request, userId));
+                                orderService.createOrder(order, userId));
+        }
+
+        // Helper
+        private String extractUserIdFromHeader(HttpServletRequest request) {
+                String authHeader = request.getHeader("Authorization");
+
+                if (authHeader == null || authHeader.isEmpty()) {
+                        throw new BadRequestException("Authorization header không được để trống");
+                }
+
+                String token = authHeader.replace("Bearer ", "");
+
+                if (!jwtUtil.isTokenValid(token)) {
+                        throw new BadRequestException("Token không hợp lệ");
+                }
+
+                String role = jwtUtil.extractRole(token);
+                if (!"customer".equals(role)) {
+                        throw new ForbiddenException("Chỉ customer mới có thể truy cập");
+                }
+
+                return jwtUtil.extractUserId(token);
         }
 
         // Internal

@@ -5,8 +5,8 @@ import { useSendRegisterOTP } from "../../../../hooks/auth/useSendRegisterOtp";
 import toast from "react-hot-toast";
 import { validateEmail } from "../../../../utils/validateEmail";
 import { validatePhone } from "../../../../utils/validatePhone";
-import Overplay from "../../../Overplay";
-import Loading from "../../../Loading";
+import Overplay from "../../ui/Overplay";
+import Loading from "../../../ui/Loading";
 
 type Props = {
   onClose: () => void;
@@ -279,7 +279,7 @@ function RegisterModal({ onClose, onSwitchLogin }: Props) {
                 <button
                   disabled={isLoading}
                   type="submit"
-                  className="w-full bg-blue-500 text-white focus:outline-none font-semibold rounded-sm uppercase text-[0.9rem] px-5 py-2.5 text-center"
+                  className="w-full bg-primary text-white focus:outline-none font-semibold rounded-sm uppercase text-[0.9rem] px-5 py-2.5 text-center"
                 >
                   Đăng kí
                 </button>
@@ -289,7 +289,7 @@ function RegisterModal({ onClose, onSwitchLogin }: Props) {
                   <button
                     type="button"
                     onClick={onSwitchLogin}
-                    className="text-blue-500 font-medium"
+                    className="text-primary font-medium"
                   >
                     Đăng nhập
                   </button>

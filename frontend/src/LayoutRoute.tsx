@@ -87,7 +87,7 @@ function LayoutRoute() {
         }
       />
 
-      <Route path="/order/result" element={<OrderResultPage />} />
+      <Route path="/order-result" element={<OrderResultPage />} />
 
       <Route
         path="/admin/login"

@@ -9,6 +9,7 @@ import { useAddItemToCart } from "../../../../hooks/customer/cart/useAddItemToCa
 import useGetAccount from "../../../../hooks/auth/useGetAccount";
 import useGetCart from "../../../../hooks/customer/cart/useGetCart";
 import toast from "react-hot-toast";
+import ProductDetailSkeleton from "../../skeleton/ProductDetailSkeleton";
 
 type Props = {
   product: ProductResponse;
@@ -20,7 +21,7 @@ function ProductDetail({ product }: Props) {
 
   const { account } = useGetAccount("customer");
   const { cart, mutate } = useGetCart();
-  const { addItem, isLoading } = useAddItemToCart();
+  const { addItem, isLoading: isLoadingCart } = useAddItemToCart();
 
   const HandleIncrement = () => {
     const maxQuantity = product?.stock > max ? max : product?.stock;
@@ -67,6 +68,8 @@ function ProductDetail({ product }: Props) {
     }
   };
 
+  if (!product) return <ProductDetailSkeleton />;
+
   return (
     <section className="w-full mb-[40px] px-[15px]">
       <div className="mx-auto w-full max-w-[1200px]">
@@ -88,19 +91,19 @@ function ProductDetail({ product }: Props) {
                       {product?.price.toLocaleString("vi-VN")}₫
                     </del>
 
-                    <h3 className="text-[#FF4C58] font-medium">
+                    <h3 className="text-accent font-medium">
                       {(product?.price - product?.discount).toLocaleString(
                         "vi-VN",
                       )}
                       ₫
                     </h3>
 
-                    <p className="text-[#FF4C58] p-1.5 border border-[#FF4C58] rounded-sm font-semibold">
+                    <p className="text-accent p-1.5 border border-accent rounded-sm font-semibold">
                       -{Math.floor((product.discount / product.price) * 100)}%
                     </p>
                   </>
                 ) : (
-                  <h3 className="font-medium text-[#FF4C58]">
+                  <h3 className="font-medium text-accent">
                     {product?.price.toLocaleString("vi-VN")}₫
                   </h3>
                 )}
@@ -146,10 +149,10 @@ function ProductDetail({ product }: Props) {
 
                     <button
                       type="button"
-                      disabled={isLoading}
+                      disabled={isLoadingCart}
                       onClick={handleAddItemToCart}
                       data-testid="btn-add-to-cart"
-                      className="p-[10px] w-full uppercase text-[0.9rem] font-semibold border border-blue-500 text-blue-500"
+                      className="p-[10px] w-full uppercase text-[0.9rem] font-semibold bg-primary text-white"
                     >
                       Thêm vào giỏ
                     </button>
@@ -157,7 +160,7 @@ function ProductDetail({ product }: Props) {
                 ) : (
                   <button
                     type="button"
-                    className="p-[10px] w-full uppercase text-[0.9rem] font-semibold border bg-transparent border-[#FF4C58] text-[#FF4C58]"
+                    className="p-[10px] w-full uppercase text-[0.9rem] font-semibold border bg-transparent border-accent text-accent"
                   >
                     Hết hàng
                   </button>

@@ -8,12 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import com.backend.product_service.config.InternalFeignConfig;
 import com.backend.product_service.dto.response.CategoryResponse;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
-@FeignClient(name = "category-service", configuration = InternalFeignConfig.class)
+@FeignClient(name = "category-service")
 public interface CategoryServiceClient {
 
     @GetMapping("/api/category/internal/{id}")

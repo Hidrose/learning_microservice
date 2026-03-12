@@ -1,12 +1,12 @@
 import { VscTrash } from "react-icons/vsc";
 import { LiaEdit } from "react-icons/lia";
 import { FaRegEyeSlash } from "react-icons/fa";
-import Image from "../../Image";
-import Pagination from "../Pagination";
-import FilterDropDownMenu from "../FilterDropDownMenu";
+import Image from "../../ui/Image";
+import Pagination from "../ui/Pagination";
+import FilterDropDownMenu from "../ui/FilterDropDownMenu";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
-import Loading from "../../Loading";
-import InputSearch from "../InputSearch";
+import Loading from "../../ui/Loading";
+import InputSearch from "../ui/InputSearch";
 import { Link } from "react-router-dom";
 import ListHeader from "../list/ListHeader";
 import ListBody from "../list/ListBody";
@@ -140,7 +140,7 @@ function ProductList() {
                             {product.price.toLocaleString("vi-VN")}₫
                           </del>
 
-                          <p className="font-medium text-[#FF4C58]">
+                          <p className="font-medium text-accent">
                             {(product.price - product.discount).toLocaleString(
                               "vi-VN",
                             )}
@@ -148,7 +148,7 @@ function ProductList() {
                           </p>
                         </div>
                       ) : (
-                        <p className="font-medium text-[#FF4C58]">
+                        <p className="font-medium text-accent">
                           {product.price.toLocaleString("vi-VN")}₫
                         </p>
                       )}

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import type { OrderResponse } from "../../../types/type";
-import Image from "../../Image";
+import Image from "../../ui/Image";
 import { CiCalendar } from "react-icons/ci";
 import { memo } from "react";
 
@@ -86,12 +86,12 @@ function OrderCard({ order }: Props) {
                   {item.discount > 0 ? (
                     <>
                       <del>{item.price.toLocaleString("vi-VN")}₫</del>
-                      <span className="font-medium text-[#FF4C58]">
+                      <span className="font-medium text-accent">
                         {(item.price - item.discount).toLocaleString("vi-VN")}₫
                       </span>
                     </>
                   ) : (
-                    <span className="font-medium text-[#FF4C58]">
+                    <span className="font-medium text-accent">
                       {item.price.toLocaleString("vi-VN")} ₫
                     </span>
                   )}
@@ -110,7 +110,7 @@ function OrderCard({ order }: Props) {
 
           <Link
             to={`/order/history/${order.orderCode}`}
-            className="text-white text-[0.9rem] font-medium px-[10px] py-[6px] bg-blue-500"
+            className="text-white text-[0.9rem] font-medium px-[10px] py-[6px] bg-primary"
           >
             Xem chi tiết
           </Link>

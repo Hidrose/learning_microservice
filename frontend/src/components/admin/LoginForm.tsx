@@ -1,15 +1,18 @@
-import Image from "../Image";
+import Image from "../ui/Image";
 import { useState } from "react";
 import { HiOutlineEyeOff, HiOutlineEye } from "react-icons/hi";
-import Loading from "../Loading";
-import Overplay from "./Overplay";
+import Loading from "../ui/Loading";
+import Overplay from "./ui/Overplay";
 import useLogin from "../../hooks/auth/useLogin";
 import toast from "react-hot-toast";
+import useGetAccount from "../../hooks/auth/useGetAccount";
 function LoginForm() {
   const [data, setData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const { handleLogin, isLoading } = useLogin();
+
+  const { isLoading: isLoadingAccount, mutate } = useGetAccount("customer");
 
   const toggleShowPassword = () => {
     setShowPassword((prev) => !prev);
@@ -30,6 +33,10 @@ function LoginForm() {
         email: data.email,
         password: data.password,
       });
+
+      await mutate();
+
+      toast.success("Đăng nhập thành công");
 
       setData({
         email: "",
@@ -106,7 +113,7 @@ function LoginForm() {
                   <button
                     disabled={isLoading}
                     type="submit"
-                    className="w-full bg-blue-500 text-[0.9rem] text-white focus:outline-none font-semibold rounded-sm px-5 py-2.5 text-center mt-6"
+                    className="w-full bg-primary text-[0.9rem] text-white focus:outline-none font-semibold rounded-sm px-5 py-2.5 text-center mt-6"
                   >
                     Đăng nhập
                   </button>
@@ -126,7 +133,7 @@ function LoginForm() {
         </div>
       </section>
 
-      {isLoading && (
+      {(isLoading || isLoadingAccount) && (
         <Overplay>
           <Loading height={0} size={55} color="white" thickness={8} />
           <h4 className="text-white">Vui lòng chờ trong giây lát ...</h4>

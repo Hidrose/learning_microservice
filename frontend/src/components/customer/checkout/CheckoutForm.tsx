@@ -3,17 +3,17 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { validatePhone } from "../../../utils/validatePhone";
 import useGetProvinces from "../../../hooks/customer/useGetProvincesVN";
-import Image from "../../Image";
+import Image from "../../ui/Image";
 import ProductBuyList from "./ProductBuyList";
 import PaymentMethod from "./PaymentMethod";
 import ShippingInfoForm from "./ShippingInfoForm";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
-import useGetAccount from "../../../hooks/auth/useGetAccount";
 import useGetCart from "../../../hooks/customer/cart/useGetCart";
 import useAddOrder from "../../../hooks/customer/order/useAddOrder";
 import usePaymentMomo from "../../../hooks/customer/payment/usePaymentMomo";
-import Overplay from "../../Overplay";
-import Loading from "../../Loading";
+import Overplay from "../ui/Overplay";
+import Loading from "../../ui/Loading";
+
 function CheckoutForm() {
   const navigate = useNavigate();
   const [data, setData] = useState({
@@ -27,7 +27,6 @@ function CheckoutForm() {
   const [isOrderPlaced, setIsOrderPlaced] = useState<boolean>(false);
 
   const { provinces } = useGetProvinces();
-  const { account } = useGetAccount("customer");
   const { cart, isLoading: isLoadingCart, mutate: mutateCart } = useGetCart();
   const { addOrder, isLoading: isLoadingOrder } = useAddOrder();
   const { createPaymentMomo, isLoading: isLoadingPaymentMomo } =
@@ -47,6 +46,8 @@ function CheckoutForm() {
   useEffect(() => {
     if (isOrderPlaced) return;
 
+    if (isLoadingCart) return;
+
     if (!cart?.items.length || !cart) {
       toast.error("Không có gì trong giỏ hết");
       navigate("/cart");
@@ -64,7 +65,14 @@ function CheckoutForm() {
       toast.error("Một số sản phẩm đang tạm ngừng bán trong giỏ hàng");
       navigate("/cart");
     }
-  }, [cart, outOfStockItems, navigate, isOrderPlaced]);
+  }, [
+    cart,
+    outOfStockItems,
+    unavailableItems,
+    navigate,
+    isOrderPlaced,
+    isLoadingCart,
+  ]);
 
   const totalPrice = useMemo(() => {
     return (
@@ -101,7 +109,7 @@ function CheckoutForm() {
       return;
     }
 
-    if (cart?.items.length === 0) {
+    if (!cart?.items.length) {
       toast.error("Không có gì trong giỏ hết");
       navigate("/cart");
       return;
@@ -112,54 +120,32 @@ function CheckoutForm() {
       return;
     }
 
+    const items = cart.items.map(
+      ({ productId, quantity, price, discount }) => ({
+        productId,
+        quantity,
+        price,
+        discount,
+      }),
+    );
+
+    const orderPayload = { ...data, paymethod, items };
+
     setIsOrderPlaced(true);
 
-    const items = cart?.items.map((item) => {
-      return {
-        productId: item.productId,
-        quantity: item.quantity,
-        price: item.price,
-        discount: item.discount,
-      };
-    });
+    try {
+      const res = await addOrder(orderPayload);
 
-    if (paymethod === "cod") {
-      try {
-        await addOrder(account?.id || "", {
-          fullname: data.fullname,
-          phone: data.phone,
-          speaddress: data.speaddress,
-          city: data.city,
-          ward: data.ward,
-          paymethod: paymethod,
-          items: items!,
-        });
-
-        setIsOrderPlaced(true);
+      if (paymethod === "cod") {
         navigate("/order-result?result=successful");
-
         mutateCart({ items: [] }, false);
-      } catch (err: any) {
-        toast.error(err?.response?.data?.message);
-      }
-    } else if (paymethod === "momo") {
-      try {
-        const res = await addOrder(account?.id || "", {
-          fullname: data.fullname,
-          phone: data.phone,
-          speaddress: data.speaddress,
-          city: data.city,
-          ward: data.ward,
-          paymethod: paymethod,
-          items: items!,
-        });
-
-        setIsOrderPlaced(true);
+      } else {
         const momoResponse = await createPaymentMomo(res.orderCode);
         window.location.href = momoResponse.payUrl;
-      } catch (err: any) {
-        toast.error(err?.response?.data?.message);
       }
+    } catch (err: any) {
+      setIsOrderPlaced(false);
+      toast.error(err?.response?.data?.message);
     }
   };
 
@@ -194,13 +180,13 @@ function CheckoutForm() {
                 />
 
                 <div className="flex justify-between items-center">
-                  <button className="text-[0.9rem] rounded-md bg-[#FF4C58] px-4 py-2 font-medium text-white">
+                  <button className="text-[0.9rem] rounded-md bg-accent px-4 py-2 font-medium text-white">
                     Đặt hàng
                   </button>
 
                   <Link
                     to={"/cart"}
-                    className="text-[0.95rem] rounded-md bg-transparent px-4 py-2 font-medium text-[#FF4C58] border border-[#FF4C58]"
+                    className="text-[0.95rem] rounded-md bg-transparent px-4 py-2 font-medium text-accent"
                   >
                     <div className="flex gap-[5px] items-center">
                       <MdOutlineKeyboardBackspace size={25} /> Giỏ hàng
@@ -211,7 +197,10 @@ function CheckoutForm() {
             </div>
 
             <div className="order-first lg:order-last space-y-[15px] lg:sticky lg:top-0 lg:self-start">
-              <ProductBuyList items={cart?.items ?? []} />
+              <ProductBuyList
+                items={cart?.items ?? []}
+                isLoading={isLoadingCart}
+              />
 
               <hr className="border-gray-300" />
 

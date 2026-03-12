@@ -1,6 +1,6 @@
 import OrderList from "./OrderList";
-import SideBar from "../SideBar";
-import BreadCrumb from "../BreadCrumb";
+import SideBar from "../ui/SideBar";
+import BreadCrumb from "../ui/BreadCrumb";
 
 function OrderContainer() {
   const array = [

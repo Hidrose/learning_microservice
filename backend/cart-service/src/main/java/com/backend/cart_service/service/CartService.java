@@ -38,17 +38,7 @@ public class CartService {
 
     // lấy giỏ hàng của user
     public CartResponse getCartByUserId(String userId) {
-        Cart cart = getCartFromRedis(userId);
-
-        if (cart == null) {
-            cart = cartRepository.findByUserId(userId)
-                    .orElseGet(() -> cartRepository.save(
-                            Cart.builder()
-                                    .userId(userId)
-                                    .items(new ArrayList<>())
-                                    .build()));
-            saveCartToRedis(userId, cart);
-        }
+        Cart cart = getOrCreateCart(userId);
 
         if (cart.getItems().isEmpty()) {
             return CartMapper.toResponse(cart, List.of());
@@ -84,15 +74,7 @@ public class CartService {
             throw new BadRequestException("Số lượng phải lớn hơn hoặc bằng 1");
         }
 
-        Cart cart = getCartFromRedis(userId);
-
-        if (cart == null) {
-            cart = cartRepository.findByUserId(userId)
-                    .orElseGet(() -> Cart.builder()
-                            .userId(userId)
-                            .items(new ArrayList<>())
-                            .build());
-        }
+        Cart cart = getOrCreateCart(userId);
 
         CartItem item = cart.getItems().stream()
                 .filter(i -> i.getProductId().equals(request.getProductId()))
@@ -106,7 +88,6 @@ public class CartService {
         }
 
         cart = cartRepository.save(cart);
-
         saveCartToRedis(userId, cart);
 
         return getCartByUserId(userId);
@@ -115,8 +96,7 @@ public class CartService {
     // xóa sản phẩm khỏi giỏ hàng
     public CartResponse removeItem(String userId, String productId) {
 
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException("Giỏ hàng không tìm thấy"));
+        Cart cart = getOrCreateCart(userId);
 
         boolean removed = cart.getItems()
                 .removeIf(item -> item.getProductId().equals(productId));
@@ -132,16 +112,13 @@ public class CartService {
     }
 
     // cập nhật số lượng sản phẩm trong giỏ hàng
-    public CartResponse updateQuantity(
-            String userId,
-            CartItemRequest request) {
+    public CartResponse updateQuantity(String userId, CartItemRequest request) {
 
         if (request.getQuantity() < 1) {
             throw new BadRequestException("Số lượng phải lớn hơn hoặc bằng 1");
         }
 
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException("Giỏ hàng không tìm thấy"));
+        Cart cart = getOrCreateCart(userId); 
 
         CartItem item = cart.getItems().stream()
                 .filter(i -> i.getProductId().equals(request.getProductId()))
@@ -213,6 +190,29 @@ public class CartService {
         }
         redisTemplate.opsForValue()
                 .set(CART_KEY_PREFIX + userId, cart);
+    }
+
+    // helper
+    private Cart getOrCreateCart(String userId) {
+        // Cố gắng lấy từ Redis trước
+        Cart cart = getCartFromRedis(userId);
+
+        if (cart != null) {
+            return cart;
+        }
+
+        // Nếu không có trong Redis, lấy từ DB
+        cart = cartRepository.findByUserId(userId)
+                .orElseGet(() -> cartRepository.save(
+                        Cart.builder()
+                                .userId(userId)
+                                .items(new ArrayList<>())
+                                .build()));
+
+        // Lưu vào Redis
+        saveCartToRedis(userId, cart);
+
+        return cart;
     }
 
 }

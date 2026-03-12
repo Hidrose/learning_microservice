@@ -60,4 +60,6 @@ public interface OrderRepository extends JpaRepository<Order, String> {
         boolean existsByItems_ProductId(String productId);
 
         Optional<Order> findByOrderCodeAndUserId(String orderCode, String userId);
+
+        void deleteByStatusAndCreatedAtBefore(Integer status, LocalDateTime time);
 }

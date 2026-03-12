@@ -1,9 +1,9 @@
 import { TbLock, TbLockOpen } from "react-icons/tb";
-import Pagination from "../Pagination";
-import FilterDropDownMenu from "../FilterDropDownMenu";
-import Image from "../../Image";
-import Loading from "../../Loading";
-import InputSearch from "../InputSearch";
+import Pagination from "../ui/Pagination";
+import FilterDropDownMenu from "../ui/FilterDropDownMenu";
+import Image from "../../ui/Image";
+import Loading from "../../ui/Loading";
+import InputSearch from "../ui/InputSearch";
 import ListHeader from "../list/ListHeader";
 import ListBody from "../list/ListBody";
 import useGetCustomers from "../../../hooks/admin/user/useGetCustomers";

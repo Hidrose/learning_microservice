@@ -1,10 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useEffect } from "react";
-import Loading from "../../../Loading";
 import ProductDetail from "./ProductDetail";
 import ProductSlider from "../ProductSlider";
-import BreadCrumb from "../../BreadCrumb";
+import BreadCrumb from "../../ui/BreadCrumb";
 import useGetProduct from "../../../../hooks/customer/product/useGetProduct";
 import useGetSuggestionProducts from "../../../../hooks/customer/product/list/useActiveProducts";
 
@@ -25,10 +24,6 @@ function ProductDetailContainer() {
     }
   }, [product, isLoading, navigate]);
 
-  if (isLoading || isLoadingProducts) {
-    return <Loading height={70} size={50} color="black" thickness={2} />;
-  }
-
   const array = [
     { name: "Trang chủ", href: "/" },
     {
@@ -41,10 +36,13 @@ function ProductDetailContainer() {
   return (
     <>
       <BreadCrumb items={array} />
-      {product && <ProductDetail product={product} />}
-      {products && (
-        <ProductSlider products={products} title="Bạn có thể thích" />
-      )}
+      <ProductDetail product={product!} />
+
+      <ProductSlider
+        products={products}
+        title="Bạn có thể thích"
+        isLoading={isLoadingProducts}
+      />
     </>
   );
 }

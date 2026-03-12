@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
-import Image from "../../Image";
+import Image from "../../ui/Image";
 import ChatContainer from "../chatbox/ChatContainer";
-import Overplay from "../../Overplay";
+import Overplay from "../ui/Overplay";
 
 function FloatingWidget() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -17,7 +17,7 @@ function FloatingWidget() {
       <div className="fixed bottom-[15px] right-[15px] z-97">
         <button
           onClick={toggleChat}
-          className="w-14 h-14 rounded-full shadow-lg bg-blue-500 flex items-center justify-center"
+          className="w-14 h-14 rounded-full shadow-lg bg-primary flex items-center justify-center"
         >
           <Image
             source="/assets/chat-box.png"

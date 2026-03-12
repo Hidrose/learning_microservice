@@ -19,7 +19,7 @@ function ChatVoice({ inputRef, onInput }: Props) {
       type="button"
       onClick={recording ? stopVoice : startVoice}
       className={`w-9 h-9 flex items-center justify-center rounded-full ${
-        recording ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-500"
+        recording ? "bg-primary text-white" : "bg-gray-200 text-gray-500"
       }`}
     >
       {recording ? <RiVoiceAiLine size={18} /> : <LuMic size={18} />}

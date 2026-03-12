@@ -1,7 +1,7 @@
 import { memo, useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { useNavigate, useLocation } from "react-router-dom";
-import Suggestion from "../../Suggestion";
+import Suggestion from "../../ui/Suggestion";
 
 function SearchDesktop() {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ function SearchDesktop() {
     <div className="relative w-full flex-1">
       <form
         onSubmit={handleSearch}
-        className={`flex items-stretch w-ful overflow-hidden duration-200 border border-blue-500 rounded-lg font-medium`}
+        className={`flex items-stretch w-ful overflow-hidden duration-200 border border-primary rounded-lg font-medium`}
       >
         <input
           type="text"
@@ -49,7 +49,7 @@ function SearchDesktop() {
         />
 
         <button
-          className="px-3 font-medium bg-blue-500 text-white"
+          className="px-3 font-medium bg-primary text-white"
           type="submit"
         >
           <IoSearchOutline size={22} />

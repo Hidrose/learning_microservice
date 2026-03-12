@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
-import BreadCrumb from "../BreadCrumb";
-import Pagination from "../Pagination";
+import BreadCrumb from "../ui/BreadCrumb";
+import Pagination from "../ui/Pagination";
 import ProductList from "./ProductList";
 import useGetActiveProductsByCategory from "../../../hooks/customer/product/page/useGetActiveProductsByCategory";
 

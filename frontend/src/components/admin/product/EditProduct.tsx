@@ -2,16 +2,16 @@ import { useCallback, useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { FreeMode } from "swiper/modules";
-import InputImage from "../InputImage";
-import Image from "../../Image";
-import ImageViewer from "../../ImageViewer";
+import InputImage from "../ui/InputImage";
+import Image from "../../ui/Image";
+import ImageViewer from "../../ui/ImageViewer";
 import { HiMiniXMark } from "react-icons/hi2";
 import { SiTicktick } from "react-icons/si";
 import toast from "react-hot-toast";
 import TextBoxEditor from "../textboxeditor/TextBoxEditor";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { VscTrash } from "react-icons/vsc";
-import InputImage1 from "../InputImage1";
+import InputImage1 from "../ui/InputImage1";
 import { useInputImage } from "../../../hooks/admin/useInputImage";
 import { useInputImage1 } from "../../../hooks/admin/useInputImage1";
 import { useSpecification } from "../../../hooks/admin/useSpecification";
@@ -22,6 +22,7 @@ import useGetProduct from "../../../hooks/admin/product/useGetProduct";
 import useUpdateProduct from "../../../hooks/admin/product/useUpdateProduct";
 import useDeleteImageProduct from "../../../hooks/admin/product/useDeleteImageProduct";
 import useUpdateImageProduct from "../../../hooks/admin/product/useUpdateProductImage";
+import SearchableSelect from "../ui/SearchableSelect";
 
 function EditProduct() {
   const navigate = useNavigate();
@@ -53,6 +54,20 @@ function EditProduct() {
     useUpdateImageProduct();
   const { categories } = useGetAllCategories();
   const { brands } = useGetAllBrands();
+
+  const categoryOptions = categories
+    .filter((c) => c.id)
+    .map((c) => ({
+      value: c.id!,
+      label: c.name,
+    }));
+
+  const brandOptions = brands
+    .filter((b) => b.id)
+    .map((b) => ({
+      value: b.id!,
+      label: b.name,
+    }));
 
   const {
     specifications,
@@ -172,8 +187,25 @@ function EditProduct() {
       return;
     }
 
+    if (data.discount > 0) {
+      if (Math.floor((data.discount / data.price) * 100) < 1) {
+        toast.error("Phần trăm giảm giá phải lớn hơn hoặc bằng 1%");
+        return;
+      }
+    }
+
     if (Number(data.stock) < 0) {
       toast.error("Số lượng hiện có phải lớn hơn hoặc bằng 0");
+      return;
+    }
+
+    if (!data.category) {
+      toast.error("Vui lòng chọn danh mục");
+      return;
+    }
+
+    if (!data.brand) {
+      toast.error("Vui lòng chọn thương hiệu");
       return;
     }
 
@@ -340,39 +372,50 @@ function EditProduct() {
                   <label htmlFor="" className="text-[0.9rem] font-medium">
                     Danh mục
                   </label>
-                  <select
-                    name="category"
-                    required
-                    onChange={handleChange}
+                  <SearchableSelect
+                    options={categoryOptions}
                     value={data.category}
-                    className="border border-gray-300 p-[6px_10px] text-[0.9rem] w-full outline-none focus:border-gray-400  "
-                  >
-                    <option value="">Chọn danh mục</option>
-                    {categories.map((category) => (
-                      <option value={category.id} key={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(val) =>
+                      setData((prev) => ({
+                        ...prev,
+                        category: val,
+                      }))
+                    }
+                    placeholder="Chọn danh mục"
+                  />
                 </div>
 
                 <div className="flex flex-col gap-1 w-full">
                   <label htmlFor="" className="text-[0.9rem] font-medium">
                     Thương hiệu
                   </label>
+                  <SearchableSelect
+                    options={brandOptions}
+                    value={data.brand}
+                    onChange={(val) =>
+                      setData((prev) => ({
+                        ...prev,
+                        brand: val,
+                      }))
+                    }
+                    placeholder="Chọn thương hiệu"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1 w-full">
+                  <label htmlFor="" className="text-[0.9rem] font-medium">
+                    Tình trạng
+                  </label>
                   <select
-                    name="brand"
+                    name="status"
                     required
                     onChange={handleChange}
-                    value={data.brand}
+                    value={data.status}
                     className="border border-gray-300 p-[6px_10px] text-[0.9rem] w-full outline-none focus:border-gray-400  "
                   >
-                    <option value="">Chọn thương hiệu</option>
-                    {brands.map((brand) => (
-                      <option value={brand.id} key={brand.id}>
-                        {brand.name}
-                      </option>
-                    ))}
+                    <option value="">Chọn tình trạng</option>
+                    <option value="0">Ẩn</option>
+                    <option value="1">Hiện</option>
                   </select>
                 </div>
               </div>

@@ -113,6 +113,8 @@ public class BrandService {
         BrandMapper.updateEntity(brand, request);
         brand.setSlug(SlugUtil.toSlug(brand.getName()));
 
+        brand = brandRepository.save(brand);
+
         return BrandMapper.toResponse(brand);
     }
 

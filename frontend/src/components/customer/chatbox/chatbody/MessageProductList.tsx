@@ -1,5 +1,5 @@
 import { memo } from "react";
-import Image from "../../../Image";
+import Image from "../../../ui/Image";
 import { Link } from "react-router-dom";
 
 function MessageProductList({ products }: any) {
