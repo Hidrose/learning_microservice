@@ -1,0 +1,16 @@
+# Environment variables - KHÔNG commit file này
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Build outputs
+target/
+dist/
+node_modules/

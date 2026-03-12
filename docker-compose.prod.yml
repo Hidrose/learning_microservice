@@ -1,0 +1,238 @@
+# docker-compose dành cho môi trường PRODUCTION (AWS EC2)
+# Sử dụng images đã build sẵn từ Docker Hub thay vì build local
+#
+# Yêu cầu file .env trên EC2 với biến:
+#   DOCKERHUB_USERNAME=your_dockerhub_username
+#
+# Khởi động lần đầu: docker-compose -f docker-compose.prod.yml up -d
+
+networks:
+  app-network:
+    driver: bridge
+
+services:
+  eureka-server:
+    image: ${DOCKERHUB_USERNAME}/eureka-server:latest
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - app-network
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx192m"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/eureka/apps"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+    restart: unless-stopped
+
+  user-service:
+    image: ${DOCKERHUB_USERNAME}/user-service:latest
+    container_name: user-service
+    networks:
+      - app-network
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+      DATASOURCE_URL: ${DATASOURCE_URL_USER}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx192m"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  auth-service:
+    image: ${DOCKERHUB_USERNAME}/auth-service:latest
+    container_name: auth-service
+    networks:
+      - app-network
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+      DATASOURCE_URL: ${DATASOURCE_URL_AUTH}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx192m"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  product-service:
+    image: ${DOCKERHUB_USERNAME}/product-service:latest
+    container_name: product-service
+    networks:
+      - app-network
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+      DATASOURCE_URL: ${DATASOURCE_URL_PRODUCT}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx192m"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  category-service:
+    image: ${DOCKERHUB_USERNAME}/category-service:latest
+    container_name: category-service
+    networks:
+      - app-network
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+      DATASOURCE_URL: ${DATASOURCE_URL_CATEGORY}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx192m"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  brand-service:
+    image: ${DOCKERHUB_USERNAME}/brand-service:latest
+    container_name: brand-service
+    networks:
+      - app-network
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+      DATASOURCE_URL: ${DATASOURCE_URL_BRAND}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx192m"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  order-service:
+    image: ${DOCKERHUB_USERNAME}/order-service:latest
+    container_name: order-service
+    networks:
+      - app-network
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+      DATASOURCE_URL: ${DATASOURCE_URL_ORDER}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx192m"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  payment-service:
+    image: ${DOCKERHUB_USERNAME}/payment-service:latest
+    container_name: payment-service
+    networks:
+      - app-network
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+      DATASOURCE_URL: ${DATASOURCE_URL_PAYMENT}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      FRONTEND_URL: ${FRONTEND_URL}
+      BACKEND_URL: ${BACKEND_URL}
+      MOMO_PARTNERCODE: ${MOMO_PARTNERCODE}
+      MOMO_ACCESSKEY: ${MOMO_ACCESSKEY}
+      MOMO_SECRETKEY: ${MOMO_SECRETKEY}
+      MOMO_URL: ${MOMO_URL}
+      MOMO_REFUND_URL: ${MOMO_REFUND_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx192m"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  cart-service:
+    image: ${DOCKERHUB_USERNAME}/cart-service:latest
+    container_name: cart-service
+    networks:
+      - app-network
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+      SPRING_DATA_MONGODB_URI: ${MONGODB_URI_CART}
+      SPRING_DATA_REDIS_HOST: ${REDIS_HOST}
+      SPRING_DATA_REDIS_PORT: ${REDIS_PORT:-6379}
+      SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx192m"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  chat-service:
+    image: ${DOCKERHUB_USERNAME}/chat-service:latest
+    container_name: chat-service
+    networks:
+      - app-network
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+      SPRING_DATA_MONGODB_URI: ${MONGODB_URI_CHAT}
+      JWT_SECRET: ${JWT_SECRET}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx192m"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  assistant-service:
+    image: ${DOCKERHUB_USERNAME}/assistant-service:latest
+    container_name: assistant-service
+    networks:
+      - app-network
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+      JWT_SECRET: ${JWT_SECRET}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx192m"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  api-gateway:
+    image: ${DOCKERHUB_USERNAME}/api-gateway:latest
+    container_name: api-gateway
+    ports:
+      - "8090:8090"
+    networks:
+      - app-network
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+      FRONTEND_URL: ${FRONTEND_URL}
+      JAVA_TOOL_OPTIONS: "-Xms64m -Xmx192m"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    image: ${DOCKERHUB_USERNAME}/frontend:latest
+    container_name: frontend
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    restart: unless-stopped
