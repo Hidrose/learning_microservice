@@ -1,13 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import useSWR from "swr";
-import type { CategoryResponse } from "../../../types/type";
-
-interface ResponseType {
-  categories: CategoryResponse[];
-  totalPages: number;
-  total: number;
-}
+import type { ApiResponse, CategoryResponse } from "../../../types/type";
 
 const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
@@ -27,17 +21,15 @@ export default function useGetCategories() {
 
   const url = `${import.meta.env.VITE_BACKEND_URL}/category?${query.toString()}`;
 
-  const { data, error, isLoading, mutate } = useSWR<ResponseType>(
-    url,
-    fetcher,
-    {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false,
-    },
-  );
+  const { data, error, isLoading, mutate } = useSWR<
+    ApiResponse<CategoryResponse[]>
+  >(url, fetcher, {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+  });
 
   return {
-    categories: data?.categories ?? [],
+    categories: data?.data ?? [],
     totalPages: data?.totalPages || 1,
     totalItems: data?.total || 0,
     currentPage: page,

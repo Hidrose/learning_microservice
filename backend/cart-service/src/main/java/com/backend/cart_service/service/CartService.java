@@ -13,9 +13,9 @@ import com.backend.cart_service.client.ProductServiceClient;
 import com.backend.cart_service.dto.request.CartItemRequest;
 import com.backend.cart_service.dto.response.CartItemResponse;
 import com.backend.cart_service.dto.response.CartResponse;
-import com.backend.cart_service.dto.response.ProductResponse;
-import com.backend.cart_service.exception.BadRequestException;
-import com.backend.cart_service.exception.NotFoundException;
+import com.backend.cart_service.dto.response.ProductListItemResponse;
+import com.backend.cart_service.exception.AppException;
+import com.backend.cart_service.exception.ErrorCode;
 import com.backend.cart_service.mapper.CartMapper;
 import com.backend.cart_service.model.Cart;
 import com.backend.cart_service.model.CartItem;
@@ -49,16 +49,16 @@ public class CartService {
                 .map(CartItem::getProductId)
                 .toList();
 
-        List<ProductResponse> products = productServiceClient.getProductsByIdsInternal(productIds);
+        List<ProductListItemResponse> products = productServiceClient.getProductsByIdsInternal(productIds);
 
-        Map<String, ProductResponse> productMap = products.stream()
-                .collect(Collectors.toMap(ProductResponse::getId, p -> p));
+        Map<String, ProductListItemResponse> productMap = products.stream()
+                .collect(Collectors.toMap(ProductListItemResponse::getId, p -> p));
 
         List<CartItemResponse> items = cart.getItems().stream()
                 .map(item -> {
-                    ProductResponse product = productMap.get(item.getProductId());
+                    ProductListItemResponse product = productMap.get(item.getProductId());
                     if (product == null) {
-                        throw new NotFoundException("Sản phẩm không tồn tại");
+                        throw new AppException(ErrorCode.PRODUCT_NOT_FOUND);
                     }
                     return CartMapper.toItemResponse(item, product);
                 })
@@ -68,10 +68,10 @@ public class CartService {
     }
 
     // thêm sản phẩm vào giỏ hàng
-    public CartResponse addToCart(String userId, CartItemRequest request) {
+    public void addToCart(String userId, CartItemRequest request) {
 
         if (request.getQuantity() < 1) {
-            throw new BadRequestException("Số lượng phải lớn hơn hoặc bằng 1");
+            throw new AppException(ErrorCode.INVALID_QUANTITY);
         }
 
         Cart cart = getOrCreateCart(userId);
@@ -89,12 +89,10 @@ public class CartService {
 
         cart = cartRepository.save(cart);
         saveCartToRedis(userId, cart);
-
-        return getCartByUserId(userId);
     }
 
     // xóa sản phẩm khỏi giỏ hàng
-    public CartResponse removeItem(String userId, String productId) {
+    public void removeItem(String userId, String productId) {
 
         Cart cart = getOrCreateCart(userId);
 
@@ -102,35 +100,31 @@ public class CartService {
                 .removeIf(item -> item.getProductId().equals(productId));
 
         if (!removed) {
-            throw new NotFoundException("Sản phẩm không có trong giỏ hàng");
+            throw new AppException(ErrorCode.CART_ITEM_NOT_FOUND);
         }
 
         cart = cartRepository.save(cart);
         saveCartToRedis(userId, cart);
-
-        return getCartByUserId(userId);
     }
 
     // cập nhật số lượng sản phẩm trong giỏ hàng
-    public CartResponse updateQuantity(String userId, CartItemRequest request) {
+    public void updateQuantity(String userId, CartItemRequest request) {
 
         if (request.getQuantity() < 1) {
-            throw new BadRequestException("Số lượng phải lớn hơn hoặc bằng 1");
+            throw new AppException(ErrorCode.INVALID_QUANTITY);
         }
 
-        Cart cart = getOrCreateCart(userId); 
+        Cart cart = getOrCreateCart(userId);
 
         CartItem item = cart.getItems().stream()
                 .filter(i -> i.getProductId().equals(request.getProductId()))
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException("Sản phẩm không có trong giỏ"));
+                .orElseThrow(() -> new AppException(ErrorCode.CART_ITEM_NOT_FOUND));
 
         item.setQuantity(request.getQuantity());
 
         cart = cartRepository.save(cart);
         saveCartToRedis(userId, cart);
-
-        return getCartByUserId(userId);
     }
 
     // xóa sản phẩm có id đó khỏi tất cả giỏ hàng

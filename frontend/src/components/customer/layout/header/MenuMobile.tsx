@@ -35,7 +35,7 @@ function MenuMobile({ isOpen, onToggleMenu }: MenuMobileProps) {
   return (
     <>
       <nav
-        className={`custom-scroll text-[0.9rem] fixed top-0 w-full max-w-[320px] h-screen py-[20px] px-[15px] overflow-y-auto bg-white shadow-md transition-all duration-500 ease-in-out z-[22] ${
+        className={`custom-scroll text-[0.9rem] fixed top-0 w-full max-w-[320px] h-screen py-[20px] px-[15px] overflow-y-auto bg-white shadow-md transition-all duration-500 ease-in-out z-16 ${
           isOpen ? "right-0 visible" : "right-[-100%] invisible"
         }`}
       >

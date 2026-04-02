@@ -1,8 +1,6 @@
 import { HiOutlineEyeOff, HiOutlineEye } from "react-icons/hi";
 import { memo, useState } from "react";
 import useLogin from "../../../../hooks/auth/useLogin";
-import toast from "react-hot-toast";
-import useGetAccount from "../../../../hooks/auth/useGetAccount";
 import Overplay from "../../ui/Overplay";
 import Loading from "../../../ui/Loading";
 
@@ -16,7 +14,6 @@ function LoginModal({ onClose, onSwitchRegister }: Props) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const { handleLogin, isLoading } = useLogin();
-  const { isLoading: isLoadingAccount, mutate } = useGetAccount("customer");
 
   const toggleShowPassword = () => {
     setShowPassword((prev) => !prev);
@@ -32,25 +29,17 @@ function LoginModal({ onClose, onSwitchRegister }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      await handleLogin({
-        email: data.email,
-        password: data.password,
-      });
+    await handleLogin({
+      email: data.email,
+      password: data.password,
+    });
 
-      await mutate();
+    setData({
+      email: "",
+      password: "",
+    });
 
-      toast.success("Đăng nhập thành công");
-
-      setData({
-        email: "",
-        password: "",
-      });
-
-      onClose();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
-    }
+    onClose();
   };
 
   return (
@@ -87,10 +76,7 @@ function LoginModal({ onClose, onSwitchRegister }: Props) {
 
               <form className="space-y-[15px]" onSubmit={handleSubmit}>
                 <div className="space-y-[5px]">
-                  <label
-                    htmlFor=""
-                    className="block   text-[0.9rem] font-medium"
-                  >
+                  <label htmlFor="" className="block text-[0.9rem] font-medium">
                     Email
                   </label>
                   <input
@@ -158,7 +144,7 @@ function LoginModal({ onClose, onSwitchRegister }: Props) {
         </div>
       </div>
 
-      {(isLoading || isLoadingAccount) && (
+      {isLoading && (
         <Overplay IndexForZ={99}>
           <Loading height={0} size={55} color="white" thickness={8} />
           <h4 className="text-white">Vui lòng chờ trong giây lát ...</h4>

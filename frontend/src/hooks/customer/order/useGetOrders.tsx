@@ -1,14 +1,8 @@
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import useSWR from "swr";
-import type { OrderResponse } from "../../../types/type";
+import type { ApiResponse, OrderResponse } from "../../../types/type";
 import { getCookie } from "../../../utils/cookieUtil";
-
-interface ResponseType {
-  orders: OrderResponse[];
-  totalPages: number;
-  total: number;
-}
 
 export default function useGetOrders() {
   const [searchParams] = useSearchParams();
@@ -39,17 +33,15 @@ export default function useGetOrders() {
       })
       .then((res) => res.data);
 
-  const { data, error, isLoading, mutate } = useSWR<ResponseType>(
-    url,
-    fetcher,
-    {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false,
-    },
-  );
+  const { data, error, isLoading, mutate } = useSWR<
+    ApiResponse<OrderResponse[]>
+  >(url, fetcher, {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+  });
 
   return {
-    orders: data?.orders ?? [],
+    orders: data?.data ?? [],
     totalPages: data?.totalPages || 1,
     totalItems: data?.total || 0,
     currentPage: page,

@@ -8,7 +8,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.backend.auth_service.exception.ExternalServiceException;
+import com.backend.auth_service.exception.AppException;
+import com.backend.auth_service.exception.ErrorCode;
 
 @Service
 public class EmailService {
@@ -25,7 +26,7 @@ public class EmailService {
     public void sendOtp(String email, String otp) {
 
         if (email.equals(emailSender)) {
-            throw new IllegalArgumentException("Không thể gửi OTP đến email này");
+            throw new AppException(ErrorCode.OTP_SEND_FAILED);
         }
 
         try {
@@ -44,7 +45,7 @@ public class EmailService {
             mailSender.send(message);
 
         } catch (MessagingException e) {
-            throw new ExternalServiceException("Không thể gửi OTP đến email" + e);
+            throw new AppException(ErrorCode.OTP_SEND_FAILED);
         }
     }
 

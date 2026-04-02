@@ -7,19 +7,12 @@ import InputSearch from "../ui/InputSearch";
 import ListHeader from "../list/ListHeader";
 import ListBody from "../list/ListBody";
 import useGetCustomers from "../../../hooks/admin/user/useGetCustomers";
-import toast from "react-hot-toast";
+
 import useUpdateStatusUser from "../../../hooks/admin/user/useUpdateStatusUser";
 
 function CustomerList() {
-  const {
-    customers,
-    isLoading,
-    totalItems,
-    totalPages,
-    currentPage,
-    limit,
-    mutate,
-  } = useGetCustomers();
+  const { customers, isLoading, totalItems, totalPages, currentPage, limit } =
+    useGetCustomers();
   const { updateStatusUser, isLoading: isLoadingUpdate } =
     useUpdateStatusUser();
 
@@ -34,13 +27,7 @@ function CustomerList() {
       return;
     }
 
-    try {
-      await updateStatusUser(id, status);
-      mutate();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
-      mutate();
-    }
+    await updateStatusUser(id, status);
   };
 
   return (

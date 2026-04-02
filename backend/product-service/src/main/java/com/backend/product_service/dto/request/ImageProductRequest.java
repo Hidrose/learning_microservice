@@ -13,4 +13,6 @@ import lombok.NoArgsConstructor;
 public class ImageProductRequest {
     @NotBlank(message = "URL hình ảnh không được để trống")
     private String image;
+
+    private Integer displayOrder;
 }

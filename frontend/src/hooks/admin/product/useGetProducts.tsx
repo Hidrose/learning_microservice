@@ -1,13 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import useSWR from "swr";
-import type { ProductResponse } from "../../../types/type";
-
-interface ResponseType {
-  products: ProductResponse[];
-  totalPages: number;
-  total: number;
-}
+import type { ApiResponse, ProductListItemResponse } from "../../../types/type";
 
 const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
@@ -27,17 +21,15 @@ export default function useGetProducts() {
 
   const url = `${import.meta.env.VITE_BACKEND_URL}/product?${query.toString()}`;
 
-  const { data, error, isLoading, mutate } = useSWR<ResponseType>(
-    url,
-    fetcher,
-    {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false,
-    },
-  );
+  const { data, error, isLoading, mutate } = useSWR<
+    ApiResponse<ProductListItemResponse[]>
+  >(url, fetcher, {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+  });
 
   return {
-    products: data?.products ?? [],
+    products: data?.data ?? [],
     totalPages: data?.totalPages || 1,
     totalItems: data?.total || 0,
     currentPage: page,

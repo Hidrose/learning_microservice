@@ -4,14 +4,15 @@ import { useEffect } from "react";
 import ProductDetail from "./ProductDetail";
 import ProductSlider from "../ProductSlider";
 import BreadCrumb from "../../ui/BreadCrumb";
-import useGetProduct from "../../../../hooks/customer/product/useGetProduct";
 import useGetSuggestionProducts from "../../../../hooks/customer/product/list/useActiveProducts";
+import useGetActiveProduct from "../../../../hooks/customer/product/useGetActiveProduct";
+import ProductDetailSkeleton from "../../skeleton/ProductDetailSkeleton";
 
 function ProductDetailContainer() {
   const { slug } = useParams();
   const navigate = useNavigate();
 
-  const { product, isLoading } = useGetProduct(slug || "");
+  const { product, isLoading } = useGetActiveProduct(slug || "");
   const { products, isLoading: isLoadingProducts } =
     useGetSuggestionProducts(12);
 
@@ -36,7 +37,12 @@ function ProductDetailContainer() {
   return (
     <>
       <BreadCrumb items={array} />
-      <ProductDetail product={product!} />
+
+      {isLoading ? (
+        <ProductDetailSkeleton />
+      ) : product ? (
+        <ProductDetail product={product} />
+      ) : null}
 
       <ProductSlider
         products={products}

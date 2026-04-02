@@ -31,10 +31,10 @@ export default function useRegister() {
 
     try {
       const url = `${import.meta.env.VITE_BACKEND_URL}/auth/register`;
-      await axios.post(url, formData);
-      toast.success("Đăng ký thành công");
-    } catch (err) {
-      console.error("Lỗi:", err);
+      const res = await axios.post(url, formData);
+      toast.success(res.data?.message);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message);
       throw err;
     } finally {
       setIsLoading(false);

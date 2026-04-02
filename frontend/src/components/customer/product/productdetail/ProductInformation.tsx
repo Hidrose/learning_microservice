@@ -1,14 +1,14 @@
 import { memo } from "react";
 import type {
-  CategoryResponse,
   SpecificationResponse,
 } from "../../../../types/type";
 
 type Props = {
-  category: CategoryResponse;
+  categoryName: string;
+  brandName: string
   specifications: SpecificationResponse[];
 };
-function ProductInformation({ category, specifications }: Props) {
+function ProductInformation({ categoryName, brandName, specifications }: Props) {
   return (
     <div className="text-black space-y-[15px]">
       <h4>Thông tin chi tiết</h4>
@@ -16,7 +16,12 @@ function ProductInformation({ category, specifications }: Props) {
       <div className="divide-y divide-gray-200 text-[0.9rem]">
         <div className="grid grid-cols-2 gap-2 py-2">
           <span>Danh mục</span>
-          <span className="font-medium">{category.name}</span>
+          <span className="font-medium">{categoryName}</span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 py-2">
+          <span>Thương hiệu</span>
+          <span className="font-medium">{brandName}</span>
         </div>
 
         {specifications.map((spec) => (

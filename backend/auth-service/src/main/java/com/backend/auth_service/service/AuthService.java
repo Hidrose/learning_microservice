@@ -14,15 +14,13 @@ import com.backend.auth_service.dto.request.VerifyOtpRequest;
 import com.backend.auth_service.dto.response.LoginResponse;
 import com.backend.auth_service.dto.response.UserAuthResponse;
 import com.backend.auth_service.entity.Otp;
-import com.backend.auth_service.exception.BadRequestException;
-import com.backend.auth_service.exception.ConflictException;
+import com.backend.auth_service.exception.AppException;
+import com.backend.auth_service.exception.ErrorCode;
 import com.backend.auth_service.repository.AuthRepository;
 import com.backend.auth_service.util.OtpUtil;
 import com.backend.auth_service.util.ValidationUtils;
 
 import feign.FeignException;
-import jakarta.ws.rs.ForbiddenException;
-
 @Service
 public class AuthService {
     private final AuthRepository authRepository;
@@ -45,11 +43,11 @@ public class AuthService {
     public void sendRegisterOtp(String email) {
 
         if (!ValidationUtils.validateEmail(email)) {
-            throw new IllegalArgumentException("Email không hợp lệ");
+            throw new AppException(ErrorCode.INVALID_EMAIL);
         }
 
         if (userServiceClient.existsUserByEmailInternal(email)) {
-            throw new ConflictException("Email đã được sử dụng");
+            throw new AppException(ErrorCode.EMAIL_ALREADY_USED);
         }
 
         String otp = OtpUtil.generateOtp();
@@ -58,7 +56,7 @@ public class AuthService {
 
         authRepository.findByEmail(email).ifPresent(existing -> {
             if (existing.getExpiredAt().isAfter(LocalDateTime.now().minusMinutes(5))) {
-                throw new BadRequestException("Vui lòng đợi 5 phút trước khi gửi lại OTP");
+                throw new AppException(ErrorCode.WAIT_BEFORE_RESEND_OTP);
             }
             authRepository.delete(existing);
         });
@@ -82,18 +80,18 @@ public class AuthService {
             UserRequest userRequest) {
 
         if (!otpRequest.getEmail().equals(userRequest.getEmail())) {
-            throw new BadRequestException("OTP và email đăng ký không khớp");
+            throw new AppException(ErrorCode.OTP_EMAIL_MISMATCH);
         }
 
         if (!ValidationUtils.validateEmail(userRequest.getEmail())) {
-            throw new IllegalArgumentException("Email không hợp lệ");
+            throw new AppException(ErrorCode.INVALID_EMAIL);
         }
 
         Otp otp = authRepository.findByEmail(otpRequest.getEmail())
-                .orElseThrow(() -> new BadRequestException("OTP không tồn tại"));
+                .orElseThrow(() -> new AppException(ErrorCode.OTP_NOT_FOUND));
 
         if (otp.getExpiredAt().isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("OTP đã hết hạn");
+            throw new AppException(ErrorCode.OTP_EXPIRED);
         }
 
         if (!passwordEncoder.matches(otpRequest.getOtp(), otp.getOtp())) {
@@ -102,11 +100,11 @@ public class AuthService {
 
             if (otp.getFailedAttempts() >= 5) {
                 authRepository.delete(otp);
-                throw new BadRequestException("Bạn đã nhập sai OTP quá 5 lần. Vui lòng gửi lại mã mới");
+                throw new AppException(ErrorCode.OTP_TOO_MANY_ATTEMPTS);
             }
 
             authRepository.save(otp);
-            throw new BadRequestException("OTP không đúng");
+            throw new AppException(ErrorCode.OTP_INCORRECT);
         }
 
         userServiceClient.createUserInternal(userRequest);
@@ -122,15 +120,15 @@ public class AuthService {
         try {
             user = userServiceClient.getUserByEmailInternal(request.getEmail());
         } catch (FeignException.NotFound e) {
-            throw new BadRequestException("Email hoặc mật khẩu không đúng");
+            throw new AppException(ErrorCode.LOGIN_FAILED);
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new BadRequestException("Email hoặc mật khẩu không đúng");
+            throw new AppException(ErrorCode.LOGIN_FAILED);
         }
 
         if (user.getStatus() != null && user.getStatus() == 0) {
-            throw new ForbiddenException("Tài khoản đã bị khóa");
+            throw new AppException(ErrorCode.ACCOUNT_LOCKED);
         }
 
         String token = jwtService.generateAccessToken(user);

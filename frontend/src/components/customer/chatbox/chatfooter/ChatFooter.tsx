@@ -1,12 +1,21 @@
-import { useCallback, useRef, useState } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 import ChatInput from "./ChatInput";
-import ChatVoice from "./ChatVoice";
 import SendButton from "./SendButton";
 import ToolTip from "../../ui/ToolTip";
+import useSendMessage from "../../../../hooks/customer/chat/useSendMessage";
+import useGetAccount from "../../../../hooks/auth/useGetAccount";
+import toast from "react-hot-toast";
+import ChatVoice from "./ChatVoice";
+import { openAuthModal } from "../../../../redux/slices/AuthModalSlice";
+import { useDispatch } from "react-redux";
 
 function ChatFooter() {
+  const dispatch = useDispatch();
   const [textLength, setTextLength] = useState<number>(0);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const { sendMessage, isLoading } = useSendMessage();
+  const { account } = useGetAccount("customer");
 
   const handleInput = useCallback(() => {
     const el = inputRef.current;
@@ -18,7 +27,7 @@ function ChatFooter() {
     setTextLength(el.value.trim().length);
   }, []);
 
-  const handleSubmit = (e?: React.FormEvent) => {
+  const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
 
     const message = inputRef.current?.value?.trim();
@@ -27,11 +36,19 @@ function ChatFooter() {
       return;
     }
 
-    console.log(message);
+    if (!account?.id) {
+      dispatch(openAuthModal("login"));
+      toast.error("Bạn phải đăng nhập để nhắn tin với trợ lý ảo");
+      return;
+    }
 
     inputRef.current!.value = "";
     inputRef.current!.style.height = "auto";
     setTextLength(0);
+
+    await sendMessage({
+      content: message,
+    });
   };
 
   return (
@@ -59,7 +76,7 @@ function ChatFooter() {
             <div className="relative group">
               {textLength > 1000 && <ToolTip text={"Tin nhắn quá dài"} />}
 
-              <SendButton textLength={textLength} />
+              <SendButton textLength={textLength} isLoading={isLoading} />
             </div>
           </label>
         </form>
@@ -68,4 +85,4 @@ function ChatFooter() {
   );
 }
 
-export default ChatFooter;
+export default memo(ChatFooter);

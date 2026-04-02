@@ -1,13 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import useSWR from "swr";
-import type { UserResponse } from "../../../types/type";
-
-interface ResponseType {
-  admins: UserResponse[];
-  totalPages: number;
-  total: number;
-}
+import type { ApiResponse, UserResponse } from "../../../types/type";
 
 const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
@@ -27,17 +21,15 @@ export default function useGetAdmins() {
 
   const url = `${import.meta.env.VITE_BACKEND_URL}/user/admins?${query.toString()}`;
 
-  const { data, error, isLoading, mutate } = useSWR<ResponseType>(
-    url,
-    fetcher,
-    {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false,
-    },
-  );
+  const { data, error, isLoading, mutate } = useSWR<
+    ApiResponse<UserResponse[]>
+  >(url, fetcher, {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+  });
 
   return {
-    admins: data?.admins ?? [],
+    admins: data?.data ?? [],
     totalPages: data?.totalPages || 1,
     totalItems: data?.total || 0,
     currentPage: page,

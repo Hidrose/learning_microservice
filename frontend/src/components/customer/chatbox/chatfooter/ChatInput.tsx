@@ -25,7 +25,7 @@ const ChatInput = forwardRef<HTMLTextAreaElement, Props>(
         className="px-3 py-3 flex-1 w-full resize-none overflow-y-auto max-h-[120px] border-0 text-[0.9rem] outline-0 bg-transparent"
       />
     );
-  }
+  },
 );
 
 export default memo(ChatInput);

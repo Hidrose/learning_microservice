@@ -43,7 +43,7 @@ function OrderDetailContainer() {
           <div className="flex justify-center flex-wrap gap-5">
             <SideBar />
 
-            <OrderInfo order={order} isLoading={isLoading} />
+            <OrderInfo order={order!} isLoading={isLoading} />
           </div>
         </div>
       </section>

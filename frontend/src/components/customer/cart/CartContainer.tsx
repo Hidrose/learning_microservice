@@ -4,13 +4,13 @@ import ProductSlider from "../product/ProductSlider";
 import CartItemList from "./CartItemList";
 
 function CartContainer() {
-  const { cart, isLoading: isLoadingCart, mutate } = useGetCart();
+  const { cart, isLoading: isLoadingCart } = useGetCart();
   const { products, isLoading: isLoadingProducts } =
     useGetSuggestionProducts(12);
 
   return (
     <>
-      <CartItemList cart={cart!} mutate={mutate} isLoading={isLoadingCart} />
+      <CartItemList cart={cart!} isLoading={isLoadingCart} />
 
       <ProductSlider
         products={products}

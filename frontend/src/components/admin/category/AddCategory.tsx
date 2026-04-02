@@ -15,11 +15,11 @@ function AddCategory() {
 
   const {
     previewImages,
-    selectedFiles,
-    setPreviewImages,
-    setSelectedFiles,
+    getOrderedFiles,
     handlePreviewImage,
     handleRemovePreviewImage,
+    handleReorder,
+    clearImages,
   } = useInputImage(1);
 
   const handleChange = (
@@ -34,22 +34,26 @@ function AddCategory() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await addCategory({
-        name: data.name.trim(),
-        image: selectedFiles[0],
-        status: Number(data.status),
-      });
+    const orderedFiles = getOrderedFiles();
 
-      setData({
-        name: "",
-        status: "",
-      });
-      setPreviewImages([]);
-      setSelectedFiles([]);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
+    if (!orderedFiles[0]) {
+      toast.error("Vui lòng thêm hình danh mục");
+      return;
     }
+
+    await addCategory(
+      {
+        name: data.name.trim(),
+        status: Number(data.status),
+      },
+      orderedFiles[0],
+    );
+
+    setData({
+      name: "",
+      status: "",
+    });
+    clearImages();
   };
 
   return (
@@ -65,6 +69,7 @@ function AddCategory() {
                 previewImages={previewImages}
                 onPreviewImage={handlePreviewImage}
                 onRemovePreviewImage={handleRemovePreviewImage}
+                onReorderImages={handleReorder}
                 blockIndex={0}
               />
             </div>

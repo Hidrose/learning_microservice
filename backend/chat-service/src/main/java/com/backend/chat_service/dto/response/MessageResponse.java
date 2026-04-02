@@ -2,7 +2,6 @@ package com.backend.chat_service.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +16,6 @@ public class MessageResponse {
     private String chatId;
     private String role;
     private String content;
-    private List<ProductSuggestionResponse> products;
-    private Map<String, Object> extraData;
+    private List<ProductListItemResponse> products;
     private LocalDateTime createdAt;
 }

@@ -9,10 +9,9 @@ import CartItemListSkeleton from "../skeleton/CartItemListSkeleton";
 type Props = {
   cart: CartResponse;
   isLoading: boolean;
-  mutate: () => void;
 };
 
-function CartItemList({ cart, isLoading = false, mutate }: Props) {
+function CartItemList({ cart, isLoading = false }: Props) {
   const navigate = useNavigate();
 
   const totalQuantity = useMemo(() => {
@@ -83,7 +82,6 @@ function CartItemList({ cart, isLoading = false, mutate }: Props) {
                   key={item.productId}
                   item={item}
                   userId={cart.userId!}
-                  mutate={mutate}
                 />
               ))}
             </div>
@@ -91,7 +89,7 @@ function CartItemList({ cart, isLoading = false, mutate }: Props) {
             <div className="bg-[#F7F7F7] rounded-sm px-4 py-6 h-auto basis-[40%]">
               <div className="flex justify-between items-center">
                 <h4>Tổng cộng</h4>
-                <h4 className="text-[#FF424E]">
+                <h4 className="text-accent">
                   {totalPrice.toLocaleString("vi-VN")}₫
                 </h4>
               </div>
@@ -102,7 +100,7 @@ function CartItemList({ cart, isLoading = false, mutate }: Props) {
                 <button
                   onClick={handleCheckout}
                   type="submit"
-                  className="text-[0.9rem] px-4 py-2.5 w-full font-semibold tracking-wide bg-[#FF424E] text-white rounded-md"
+                  className="text-[0.9rem] px-4 py-2.5 w-full font-semibold tracking-wide bg-accent text-white rounded-md"
                 >
                   Thanh toán
                 </button>
@@ -129,7 +127,7 @@ function CartItemList({ cart, isLoading = false, mutate }: Props) {
               <h4>Không có gì trong giỏ hết</h4>
 
               <Link
-                to={"/books/all"}
+                to={"/products/all"}
                 className="text-[0.9rem] border-2 uppercase border-primary rounded-md font-semibold px-3 py-2 hover:bg-primary text-primary hover:text-white"
               >
                 Mua hàng ngay

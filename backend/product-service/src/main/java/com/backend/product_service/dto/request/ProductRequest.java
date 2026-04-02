@@ -43,8 +43,5 @@ public class ProductRequest {
     private String brandId;
 
     @Valid
-    private List<ImageProductRequest> images;
-
-    @Valid
     private List<SpecificationRequest> specifications;
 }

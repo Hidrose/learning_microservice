@@ -6,7 +6,7 @@ import com.backend.cart_service.dto.request.CartItemRequest;
 import com.backend.cart_service.dto.response.CartItemResponse;
 import com.backend.cart_service.dto.response.CartResponse;
 import com.backend.cart_service.dto.response.ImageProductResponse;
-import com.backend.cart_service.dto.response.ProductResponse;
+import com.backend.cart_service.dto.response.ProductListItemResponse;
 import com.backend.cart_service.model.Cart;
 import com.backend.cart_service.model.CartItem;
 
@@ -28,7 +28,7 @@ public final class CartMapper {
 
         public static CartItemResponse toItemResponse(
                         CartItem cartItem,
-                        ProductResponse product) {
+                        ProductListItemResponse product) {
 
                 return CartItemResponse.builder()
                                 .productId(product.getId())

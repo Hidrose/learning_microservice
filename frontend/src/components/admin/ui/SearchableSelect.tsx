@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, memo } from "react";
 import { MdKeyboardArrowDown } from "react-icons/md";
 
 type Option = {
@@ -13,7 +13,7 @@ type SearchableSelectProps = {
   placeholder?: string;
 };
 
-export default function SearchableSelect({
+function SearchableSelect({
   options,
   value,
   onChange,
@@ -43,24 +43,24 @@ export default function SearchableSelect({
   }, []);
 
   return (
-    <div className="relative w-full" ref={containerRef}>
+    <div className="relative w-full cursor-pointer" ref={containerRef}>
       <div
         onClick={() => setOpen(!open)}
-        className="border border-gray-300 p-[6px_0px_6px_10px] flex items-center justify-between w-full"
+        className={`border p-[6px_10px] flex items-center justify-between w-full ${open ? "border-gray-400" : "border-gray-300"}`}
       >
         <p>{selectedOption ? selectedOption.label : placeholder}</p>
         <MdKeyboardArrowDown size={18} />
       </div>
 
       {open && (
-        <div className="absolute z-10 w-full bg-white border border-gray-300 mt-1 shadow-md max-h-60 overflow-y-auto">
-          <div className="p-2">
+        <div className="absolute z-10 w-full bg-white border border-gray-300 shadow-md max-h-60 overflow-y-auto">
+          <div>
             <input
               type="text"
               placeholder="Tìm kiếm..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="border border-gray-300 p-[6px_10px] text-[0.9rem] w-full outline-none focus:border-gray-400  "
+              className="border-b border-gray-300 p-[6px_10px] text-[0.9rem] w-full outline-none"
             />
           </div>
 
@@ -86,3 +86,5 @@ export default function SearchableSelect({
     </div>
   );
 }
+
+export default memo(SearchableSelect);

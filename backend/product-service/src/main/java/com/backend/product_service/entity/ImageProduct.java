@@ -10,8 +10,6 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import lombok.AllArgsConstructor;
@@ -42,7 +40,6 @@ public class ImageProduct {
     @JoinColumn(name = "productId", nullable = false)
     private Product product;
 
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
+    @Column(nullable = false)
+    private Integer displayOrder;
 }

@@ -71,7 +71,11 @@ const SpecificationEditor = ({
                     required
                     value={spec.specKey}
                     onChange={(e) =>
-                      updateSpecification(spec.id, "specKey", e.target.value)
+                      updateSpecification(
+                        spec.id,
+                        "specKey",
+                        e.target.value,
+                      )
                     }
                     className="border border-gray-300 p-[6px_10px] text-[0.9rem] outline-none focus:border-gray-400"
                   />
@@ -83,7 +87,11 @@ const SpecificationEditor = ({
                     required
                     value={spec.specValue}
                     onChange={(e) =>
-                      updateSpecification(spec.id, "specValue", e.target.value)
+                      updateSpecification(
+                        spec.id,
+                        "specValue",
+                        e.target.value,
+                      )
                     }
                     className="border border-gray-300 p-[6px_10px] text-[0.9rem] outline-none focus:border-gray-400"
                   />

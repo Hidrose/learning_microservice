@@ -2,21 +2,23 @@ import { memo } from "react";
 import { Link } from "react-router-dom";
 import useGetAccount from "../../../../hooks/auth/useGetAccount";
 import useLogout from "../../../../hooks/auth/useLogout";
-
+import { openAuthModal } from "../../../../redux/slices/AuthModalSlice";
+import { useDispatch } from "react-redux";
 type Props = {
-  onLogin: () => void;
-  onRegister: () => void;
   profileMenuOpen: boolean;
 };
 
-function ProfileMenu({ onLogin, onRegister, profileMenuOpen }: Props) {
-  const { account, isLoading, mutate } = useGetAccount("customer");
+function ProfileMenu({ profileMenuOpen }: Props) {
+  const { account, isLoading } = useGetAccount("customer");
   const { handleLogout } = useLogout();
+  const dispatch = useDispatch();
 
   if (!profileMenuOpen) return null;
 
   return (
-    <div className="text-[0.9rem] absolute top-full right-0 z-20 bg-white shadow-md rounded-sm overflow-hidden min-w-[125px] font-normal">
+    <div
+      className={`text-[0.9rem] font-medium absolute top-full right-0 z-20 bg-white shadow-md rounded-sm overflow-hidden w-max transition-all duration-100 origin-top`}
+    >
       {isLoading ? null : account ? (
         <>
           <p className="border-b p-2.5 border-gray-200 max-w-[210px] overflow-hidden text-ellipsis whitespace-nowrap text-center">
@@ -40,7 +42,6 @@ function ProfileMenu({ onLogin, onRegister, profileMenuOpen }: Props) {
           <button
             onClick={async () => {
               await handleLogout("customer");
-              mutate(undefined, false);
             }}
             className="hover:bg-gray-100 w-full block p-2.5 text-left"
           >
@@ -50,14 +51,14 @@ function ProfileMenu({ onLogin, onRegister, profileMenuOpen }: Props) {
       ) : (
         <>
           <button
-            onClick={onLogin}
+            onClick={() => dispatch(openAuthModal("login"))}
             className="hover:bg-gray-100 w-full block p-2.5 text-left"
           >
             Đăng nhập
           </button>
 
           <button
-            onClick={onRegister}
+            onClick={() => dispatch(openAuthModal("register"))}
             className="hover:bg-gray-100 w-full block p-2.5 text-left"
           >
             Đăng ký

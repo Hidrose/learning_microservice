@@ -1,7 +1,7 @@
 package com.backend.order_service.controller;
 
 import java.time.LocalDate;
-import java.util.Map;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -16,31 +16,25 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Page;
 import com.backend.order_service.dto.request.OrderRequest;
+import com.backend.order_service.dto.response.ApiResponse;
 import com.backend.order_service.dto.response.OrderResponse;
-import com.backend.order_service.exception.BadRequestException;
 import com.backend.order_service.service.OrderService;
-import com.backend.order_service.utils.JwtUtil;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.ForbiddenException;
-
 import org.springframework.validation.annotation.Validated;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @Validated
 @RestController
 @RequestMapping("/api/order")
 public class OrderController {
         private final OrderService orderService;
-        private final JwtUtil jwtUtil;
 
-        public OrderController(OrderService orderService, JwtUtil jwtUtil) {
+        public OrderController(OrderService orderService) {
                 this.orderService = orderService;
-                this.jwtUtil = jwtUtil;
         }
 
         // admin
         @GetMapping
-        public ResponseEntity<?> getOrders(
+        public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrders(
                         @RequestParam(defaultValue = "1") int page,
                         @RequestParam(defaultValue = "12") int limit,
                         @RequestParam(required = false) String q,
@@ -57,86 +51,97 @@ public class OrderController {
                                 end);
 
                 return ResponseEntity.ok(
-                                Map.of(
-                                                "orders", orderPage.getContent(),
-                                                "totalPages", orderPage.getTotalPages(),
-                                                "total", orderPage.getTotalElements()));
+                                ApiResponse.<List<OrderResponse>>builder()
+                                                .message("Lấy danh sách đơn hàng thành công")
+                                                .data(orderPage.getContent())
+                                                .totalPages(orderPage.getTotalPages())
+                                                .total(orderPage.getTotalElements())
+                                                .build());
         }
 
         @GetMapping("/{id}")
-        public ResponseEntity<OrderResponse> getOrderById(
+        public ResponseEntity<ApiResponse<OrderResponse>> getOrderById(
                         @PathVariable String id) {
 
                 return ResponseEntity.ok(
-                                orderService.getOrderById(id));
+                                ApiResponse.<OrderResponse>builder()
+                                                .message("Lấy chi tiết đơn hàng thành công")
+                                                .data(orderService.getOrderById(id))
+                                                .build());
         }
 
         @PatchMapping("/status/{id}")
-        public ResponseEntity<Void> updateOrderStatus(
+        public ResponseEntity<ApiResponse<Void>> updateOrderStatus(
                         @PathVariable String id,
                         @RequestParam Integer status) {
 
                 orderService.updateOrderStatus(id, status);
-                return ResponseEntity.noContent().build();
+                return ResponseEntity.ok(
+                                ApiResponse.<Void>builder()
+                                                .message("Cập nhật trạng thái đơn hàng thành công")
+                                                .build());
         }
 
         // customer
         @GetMapping("/user/{orderCode}")
-        public ResponseEntity<OrderResponse> getUserOrderByCode(@PathVariable String orderCode,
-                        HttpServletRequest request) {
+        public ResponseEntity<ApiResponse<OrderResponse>> getUserOrderByCode(@PathVariable String orderCode,
+                        @AuthenticationPrincipal String userId) {
 
-                String userId = extractUserIdFromHeader(request);
                 return ResponseEntity.ok(
-                                orderService.getOrderByOrderCodeAndUser(orderCode, userId));
+                                ApiResponse.<OrderResponse>builder()
+                                                .message("Lấy đơn hàng của bạn thành công")
+                                                .data(orderService.getOrderByOrderCodeAndUser(orderCode, userId))
+                                                .build());
         }
 
         @GetMapping("/user")
-        public ResponseEntity<?> getOrdersByUser(
+        public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrdersByUser(
                         @RequestParam(defaultValue = "1") int page,
                         @RequestParam(defaultValue = "12") int limit,
                         @RequestParam(required = false) Integer status,
-                        HttpServletRequest request) {
-
-                String userId = extractUserIdFromHeader(request);
+                        @AuthenticationPrincipal String userId) {
 
                 Page<OrderResponse> orderPage = orderService.getOrdersByUser(userId, page, limit, status);
 
                 return ResponseEntity.ok(
-                                Map.of(
-                                                "orders", orderPage.getContent(),
-                                                "totalPages", orderPage.getTotalPages(),
-                                                "total", orderPage.getTotalElements()));
+                                ApiResponse.<List<OrderResponse>>builder()
+                                                .message("Lấy danh sách đơn hàng của bạn thành công")
+                                                .data(orderPage.getContent())
+                                                .totalPages(orderPage.getTotalPages())
+                                                .total(orderPage.getTotalElements())
+                                                .build());
         }
 
         @PostMapping("/user")
-        public ResponseEntity<OrderResponse> createOrder(
-                        @RequestBody OrderRequest order, HttpServletRequest request) {
+        public ResponseEntity<ApiResponse<OrderResponse>> createOrder(
+                        @RequestBody OrderRequest order, @AuthenticationPrincipal String userId) {
 
-                String userId = extractUserIdFromHeader(request);
                 return ResponseEntity.ok(
-                                orderService.createOrder(order, userId));
+                                ApiResponse.<OrderResponse>builder()
+                                                .message("Tạo đơn hàng thành công")
+                                                .data(orderService.createOrder(order, userId))
+                                                .build());
         }
 
-        // Helper
-        private String extractUserIdFromHeader(HttpServletRequest request) {
-                String authHeader = request.getHeader("Authorization");
+        // assistant
+        @GetMapping("/assistant/user/{orderCode}")
+        public ResponseEntity<OrderResponse> getUserOrderByCodeAssistant(
+                        @PathVariable String orderCode,
+                        @AuthenticationPrincipal String userId) {
 
-                if (authHeader == null || authHeader.isEmpty()) {
-                        throw new BadRequestException("Authorization header không được để trống");
-                }
+                return ResponseEntity.ok(
+                                orderService.getOrderByOrderCodeAndUser(orderCode, userId));
+        }
 
-                String token = authHeader.replace("Bearer ", "");
+        @GetMapping("/assistant/user")
+        public ResponseEntity<List<OrderResponse>> getOrdersByUserAssistant(
+                        @RequestParam(defaultValue = "12") int limit,
+                        @RequestParam(required = false) Integer status,
+                        @AuthenticationPrincipal String userId) {
 
-                if (!jwtUtil.isTokenValid(token)) {
-                        throw new BadRequestException("Token không hợp lệ");
-                }
+                Page<OrderResponse> orderPage = orderService.getOrdersByUser(userId, 1, limit, status);
 
-                String role = jwtUtil.extractRole(token);
-                if (!"customer".equals(role)) {
-                        throw new ForbiddenException("Chỉ customer mới có thể truy cập");
-                }
-
-                return jwtUtil.extractUserId(token);
+                return ResponseEntity.ok(orderPage.getContent());
         }
 
         // Internal

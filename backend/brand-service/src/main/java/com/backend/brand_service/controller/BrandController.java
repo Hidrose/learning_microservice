@@ -16,93 +16,137 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Page;
 import com.backend.brand_service.dto.request.BrandRequest;
+import com.backend.brand_service.dto.response.ApiResponse;
 import com.backend.brand_service.dto.response.BrandResponse;
 import com.backend.brand_service.service.BrandService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.http.HttpStatus;
 
 @Validated
 @RestController
 @RequestMapping("/api/brand")
 public class BrandController {
-    private final BrandService brandService;
+        private final BrandService brandService;
 
-    public BrandController(BrandService brandService) {
-        this.brandService = brandService;
-    }
+        public BrandController(BrandService brandService) {
+                this.brandService = brandService;
+        }
 
-    @GetMapping
-    public ResponseEntity<?> getBrands(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "12") int limit,
-            @RequestParam(required = false) String q,
-            @RequestParam(required = false) Integer status) {
+        @GetMapping
+        public ResponseEntity<ApiResponse<List<BrandResponse>>> getBrands(
+                        @RequestParam(defaultValue = "1") int page,
+                        @RequestParam(defaultValue = "12") int limit,
+                        @RequestParam(required = false) String q,
+                        @RequestParam(required = false) Integer status) {
 
-        Page<BrandResponse> brandPage = brandService.getBrands(page, limit, q, status);
+                Page<BrandResponse> brandPage = brandService.getBrands(page, limit, q, status);
 
-        return ResponseEntity.ok(
-                Map.of(
-                        "brands", brandPage.getContent(),
-                        "totalPages", brandPage.getTotalPages(),
-                        "total", brandPage.getTotalElements()));
-    }
+                return ResponseEntity.ok(
+                                ApiResponse.<List<BrandResponse>>builder()
+                                                .message("Lấy danh sách thương hiệu thành công")
+                                                .data(brandPage.getContent())
+                                                .totalPages(brandPage.getTotalPages())
+                                                .total(brandPage.getTotalElements())
+                                                .build());
+        }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<BrandResponse>> getAllBrands() {
-        return ResponseEntity.ok(brandService.getAllBrands());
-    }
+        @GetMapping("/all")
+        public ResponseEntity<ApiResponse<List<BrandResponse>>> getAllBrands() {
+                return ResponseEntity.ok(
+                                ApiResponse.<List<BrandResponse>>builder()
+                                                .message("Lấy tất cả thương hiệu thành công")
+                                                .data(brandService.getAllBrands())
+                                                .build());
+        }
 
-    @GetMapping("/active")
-    public ResponseEntity<List<BrandResponse>> getActiveBrands() {
-        return ResponseEntity.ok(brandService.getActiveBrands());
-    }
+        @GetMapping("/active")
+        public ResponseEntity<ApiResponse<List<BrandResponse>>> getActiveBrands() {
+                return ResponseEntity.ok(
+                                ApiResponse.<List<BrandResponse>>builder()
+                                                .message("Lấy thương hiệu active thành công")
+                                                .data(brandService.getActiveBrands())
+                                                .build());
+        }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BrandResponse> getBrandById(@PathVariable String id) {
-        return ResponseEntity.ok(brandService.getBrandById(id));
-    }
+        @GetMapping("/{id}")
+        public ResponseEntity<ApiResponse<BrandResponse>> getBrandById(@PathVariable String id) {
+                return ResponseEntity.ok(
+                                ApiResponse.<BrandResponse>builder()
+                                                .message("Lấy chi tiết thương hiệu thành công")
+                                                .data(brandService.getBrandById(id))
+                                                .build());
+        }
 
-    @PostMapping
-    public ResponseEntity<BrandResponse> createBrand(
-            @Valid @RequestBody BrandRequest request) {
+        @PostMapping
+        public ResponseEntity<ApiResponse<Void>> createBrand(
+                        @Valid @RequestBody BrandRequest request) {
+                brandService.createBrand(request);
+                return ResponseEntity.status(HttpStatus.CREATED)
+                                .body(ApiResponse.<Void>builder()
+                                                .message("Tạo thương hiệu thành công")
+                                                .build());
+        }
 
-        return ResponseEntity.ok(brandService.createBrand(request));
-    }
+        @PutMapping("/{id}")
+        public ResponseEntity<ApiResponse<Void>> updateBrand(
+                        @PathVariable String id,
+                        @Valid @RequestBody BrandRequest request) {
+                brandService.updateBrand(id, request);
+                return ResponseEntity.ok(
+                                ApiResponse.<Void>builder()
+                                                .message("Cập nhật thương hiệu thành công")
+                                                .build());
+        }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<BrandResponse> updateBrand(
-            @PathVariable String id,
-            @Valid @RequestBody BrandRequest request) {
+        @PatchMapping("/status/{id}")
+        public ResponseEntity<ApiResponse<Void>> updateBrandStatus(
+                        @PathVariable String id,
+                        @RequestParam @NotNull Integer status) {
+                brandService.updateBrandStatus(id, status);
+                return ResponseEntity.ok(
+                                ApiResponse.<Void>builder()
+                                                .message("Cập nhật trạng thái thành công")
+                                                .build());
+        }
 
-        return ResponseEntity.ok(brandService.updateBrand(id, request));
-    }
+        @DeleteMapping("/{id}")
+        public ResponseEntity<ApiResponse<Void>> deleteBrand(@PathVariable String id) {
+                brandService.deleteBrand(id);
+                return ResponseEntity.ok(
+                                ApiResponse.<Void>builder()
+                                                .message("Xóa thương hiệu thành công")
+                                                .build());
+        }
 
-    @PatchMapping("/status/{id}")
-    public ResponseEntity<BrandResponse> updateBrandStatus(
-            @PathVariable String id,
-            @RequestParam @NotNull Integer status) {
+        // assistant
+        @GetMapping("/assistant")
+        public ResponseEntity<List<BrandResponse>> getBrandsAssistant(
+                        @RequestParam(defaultValue = "12") int limit,
+                        @RequestParam(required = false) String q,
+                        @RequestParam(required = false) Integer status) {
 
-        return ResponseEntity.ok(
-                brandService.updateBrandStatus(id, status));
-    }
+                Page<BrandResponse> brandPage = brandService.getBrands(1, limit, q, status);
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBrand(@PathVariable String id) {
-        brandService.deleteBrand(id);
-        return ResponseEntity.noContent().build();
-    }
+                return ResponseEntity.ok(brandPage.getContent());
+        }
 
-    // internal
-    @GetMapping("/internal/{id}")
-    public ResponseEntity<BrandResponse> getBrandByIdInternal(@PathVariable String id) {
-        return ResponseEntity.ok(brandService.getBrandById(id));
-    }
+        // internal
+        @GetMapping("/internal/slug/{slug}")
+        public ResponseEntity<BrandResponse> getBrandBySlugInternal(@PathVariable String slug) {
+                return ResponseEntity.ok(brandService.getBrandBySlug(slug));
+        }
 
-    @PostMapping("/internal/brands")
-    public Map<String, BrandResponse> getBrandsByIdsInternal(
-            @RequestBody List<String> ids) {
+        @GetMapping("/internal/{id}")
+        public ResponseEntity<BrandResponse> getBrandByIdInternal(@PathVariable String id) {
+                return ResponseEntity.ok(brandService.getBrandById(id));
+        }
 
-        return brandService.getBrandsByIds(ids);
-    }
+        @PostMapping("/internal/brands")
+        public Map<String, BrandResponse> getBrandsByIdsInternal(
+                        @RequestBody List<String> ids) {
+
+                return brandService.getBrandsByIds(ids);
+        }
 }

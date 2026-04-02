@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import com.backend.payment_service.client.OrderServiceClient;
 import com.backend.payment_service.dto.request.PaymentRequest;
+import com.backend.payment_service.dto.response.ApiResponse;
 import com.backend.payment_service.dto.response.MomoResponse;
 import com.backend.payment_service.dto.response.OrderResponse;
 import com.backend.payment_service.dto.response.PaymentResponse;
@@ -42,7 +44,7 @@ public class PaymentController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllPayments(
+    public ResponseEntity<ApiResponse<List<PaymentResponse>>> getAllPayments(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "12") int limit,
             @RequestParam(required = false) String q,
@@ -51,25 +53,31 @@ public class PaymentController {
         Page<PaymentResponse> paymentPage = paymentService.getAllPayments(page, limit, q, status);
 
         return ResponseEntity.ok(
-                Map.of(
-                        "payments", paymentPage.getContent(),
-                        "totalPages", paymentPage.getTotalPages(),
-                        "total", paymentPage.getTotalElements()));
+                ApiResponse.<List<PaymentResponse>>builder()
+                        .message("Lấy danh sách thanh toán thành công")
+                        .data(paymentPage.getContent())
+                        .totalPages(paymentPage.getTotalPages())
+                        .total(paymentPage.getTotalElements())
+                        .build());
     }
 
     // Momo
     @PostMapping("/momo/{orderCode}")
-    public ResponseEntity<MomoResponse> createMomo(
+    public ResponseEntity<ApiResponse<MomoResponse>> createMomo(
             @PathVariable String orderCode) throws Exception {
 
         OrderResponse order = orderServiceClient.getOrderByOrderCodeInternal(orderCode);
 
         MomoResponse momoResponse = momoService.createMomo(order);
 
-        return ResponseEntity.ok(momoResponse);
+        return ResponseEntity.ok(
+                ApiResponse.<MomoResponse>builder()
+                        .message("Tạo thanh toán Momo thành công")
+                        .data(momoResponse)
+                        .build());
     }
-    
- @GetMapping("/momo/redirect")
+
+    @GetMapping("/momo/redirect")
     public ResponseEntity<Void> handleRedirectInternal(
             @RequestParam(required = false) String resultCode,
             @RequestParam(required = false) String orderId,
@@ -98,6 +106,7 @@ public class PaymentController {
 
         return ResponseEntity.status(302).header("Location", redirectUrl).build();
     }
+
     // internal
     @PostMapping("/internal")
     public ResponseEntity<PaymentResponse> createPaymentInternal(
@@ -106,8 +115,6 @@ public class PaymentController {
         return ResponseEntity.ok(
                 paymentService.createPayment(request));
     }
-
-   
 
     @PostMapping("/internal/momo/refund/{orderCode}")
     public ResponseEntity<Void> refundMomoByOrderCodeInternal(

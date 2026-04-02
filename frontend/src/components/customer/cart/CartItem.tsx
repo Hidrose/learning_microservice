@@ -10,10 +10,9 @@ import toast from "react-hot-toast";
 type Props = {
   item: CartItemResponse;
   userId: string;
-  mutate: () => void;
 };
 
-function CartItem({ item, userId, mutate }: Props) {
+function CartItem({ item, userId }: Props) {
   const max = 15;
   const { removeItem, isLoading: isLoadingRemove } = useRemoveItemInCart();
   const { changeQuantity, isLoading: isLoadingChangeQuantity } =
@@ -24,7 +23,6 @@ function CartItem({ item, userId, mutate }: Props) {
       productId: productId,
       quantity: quantity,
     });
-    mutate();
   };
 
   const handleIncrement = (
@@ -49,7 +47,6 @@ function CartItem({ item, userId, mutate }: Props) {
 
   const handleRemoveItem = async (productId: string) => {
     await removeItem(userId, productId);
-    mutate();
   };
   return (
     <>

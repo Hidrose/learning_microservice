@@ -13,17 +13,9 @@ import ListBody from "../list/ListBody";
 import useGetBrands from "../../../hooks/admin/brand/useGetBrands";
 import useDeleteBrand from "../../../hooks/admin/brand/useDeleteBrand";
 import useUpdateStatusBrand from "../../../hooks/admin/brand/useUpdateStatusBrand";
-import toast from "react-hot-toast";
 function BrandList() {
-  const {
-    brands,
-    isLoading,
-    totalItems,
-    totalPages,
-    currentPage,
-    limit,
-    mutate,
-  } = useGetBrands();
+  const { brands, isLoading, totalItems, totalPages, currentPage, limit } =
+    useGetBrands();
   const { deleteBrand, isLoading: isLoadingDelete } = useDeleteBrand();
   const { updateStatusBrand, isLoading: isLoadingUpdate } =
     useUpdateStatusBrand();
@@ -48,13 +40,7 @@ function BrandList() {
       return;
     }
 
-    try {
-      await deleteBrand(id);
-      mutate();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
-      mutate();
-    }
+    await deleteBrand(id);
   };
 
   const handleUpdateStatus = async (id: string, status: number) => {
@@ -62,13 +48,7 @@ function BrandList() {
       return;
     }
 
-    try {
-      await updateStatusBrand(id, status);
-      mutate();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
-      mutate();
-    }
+    await updateStatusBrand(id, status);
   };
   return (
     <>

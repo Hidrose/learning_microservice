@@ -9,6 +9,6 @@ import lombok.Getter;
 @Builder
 public class ErrorResponse {
     private String message;
-    private String errorCode;
+    private String path;
     private LocalDateTime timestamp;
 }

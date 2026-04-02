@@ -7,7 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.backend.payment_service.dto.request.PaymentRequest;
 import com.backend.payment_service.dto.response.PaymentResponse;
 import com.backend.payment_service.entity.Payment;
-import com.backend.payment_service.exception.NotFoundException;
+import com.backend.payment_service.exception.AppException;
+import com.backend.payment_service.exception.ErrorCode;
 import com.backend.payment_service.mapper.PaymentMapper;
 import com.backend.payment_service.repository.PaymentRepository;
 import org.springframework.data.domain.Page;
@@ -78,7 +79,7 @@ public class PaymentService {
 
         Payment payment = paymentRepository
                 .findByOrderCode(orderCode)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy giao dịch của đơn hàng"));
+                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_ORDER_NOT_FOUND));
 
         payment.setStatus(status);
 
@@ -89,7 +90,7 @@ public class PaymentService {
 
         Payment payment = paymentRepository
                 .findByOrderCode(orderCode)
-                .orElseThrow(() -> new NotFoundException("Giao dịch thanh toán không tìm thấy"));
+                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
 
         return PaymentMapper.toResponse(payment);
     }

@@ -35,25 +35,22 @@ function AddAdmin() {
       toast.error("Mật khẩu phải có ít nhất 6 ký tự");
       return;
     }
-    try {
-      await addAdmin({
-        fullname: data.fullname.trim(),
-        phone: data.phone.trim(),
-        email: data.email.trim(),
-        password: data.password.trim(),
-        role: "admin",
-        status: 1,
-      });
 
-      setData({
-        email: "",
-        phone: "",
-        password: "",
-        fullname: "",
-      });
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
-    }
+    await addAdmin({
+      fullname: data.fullname.trim(),
+      phone: data.phone.trim(),
+      email: data.email.trim(),
+      password: data.password.trim(),
+      role: "admin",
+      status: 1,
+    });
+
+    setData({
+      email: "",
+      phone: "",
+      password: "",
+      fullname: "",
+    });
   };
 
   return (

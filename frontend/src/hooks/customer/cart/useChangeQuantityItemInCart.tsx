@@ -3,9 +3,11 @@ import { useState } from "react";
 import type { CartItemRequest } from "../../../types/type";
 import { getCookie } from "../../../utils/cookieUtil";
 import toast from "react-hot-toast";
+import useGetCart from "./useGetCart";
 
 export function useChangeQuantityItemInCart() {
   const [isLoading, setIsLoading] = useState(false);
+  const { mutate } = useGetCart();
 
   const changeQuantity = async (userId: string, data: CartItemRequest) => {
     if (!userId || !data) {
@@ -18,16 +20,17 @@ export function useChangeQuantityItemInCart() {
 
       const url = `${import.meta.env.VITE_BACKEND_URL}/cart`;
 
-      await axios.put(url, data, {
+      const res = await axios.put(url, data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+      await mutate();
 
       toast.dismiss(loadingToast);
-      toast.success("Cập nhật số lượng thành công");
+      toast.success(res.data?.message);
     } catch (err: any) {
-      console.error("Lỗi:", err);
+      toast.error(err?.response?.data?.message);
       throw err;
     } finally {
       toast.dismiss(loadingToast);

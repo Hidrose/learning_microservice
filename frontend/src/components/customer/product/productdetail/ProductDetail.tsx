@@ -1,7 +1,7 @@
 import { memo, useState } from "react";
 import { HiOutlineMinusSmall } from "react-icons/hi2";
 import { HiOutlinePlusSmall } from "react-icons/hi2";
-import type { ProductResponse } from "../../../../types/type";
+import type { ProductDetailResponse } from "../../../../types/type";
 import ProductGallery from "./ProductGallery";
 import ProductInformation from "./ProductInformation";
 import ProductDescription from "./ProductDescription";
@@ -9,18 +9,19 @@ import { useAddItemToCart } from "../../../../hooks/customer/cart/useAddItemToCa
 import useGetAccount from "../../../../hooks/auth/useGetAccount";
 import useGetCart from "../../../../hooks/customer/cart/useGetCart";
 import toast from "react-hot-toast";
-import ProductDetailSkeleton from "../../skeleton/ProductDetailSkeleton";
-
+import { openAuthModal } from "../../../../redux/slices/AuthModalSlice";
+import { useDispatch } from "react-redux";
 type Props = {
-  product: ProductResponse;
+  product: ProductDetailResponse;
 };
 
 function ProductDetail({ product }: Props) {
   const max = 15;
+  const dispatch = useDispatch();
   const [quantity, setQuantity] = useState<number>(1);
 
   const { account } = useGetAccount("customer");
-  const { cart, mutate } = useGetCart();
+  const { cart } = useGetCart();
   const { addItem, isLoading: isLoadingCart } = useAddItemToCart();
 
   const HandleIncrement = () => {
@@ -39,12 +40,13 @@ function ProductDetail({ product }: Props) {
     }
 
     if (!account?.id) {
+      dispatch(openAuthModal("login"));
       toast.error("Bạn phải đăng nhập để mua hàng");
       return;
     }
 
     const existingItem = cart?.items?.find(
-      (item: any) => item.bookId === product.id,
+      (item) => item.productId === product.id,
     );
 
     const currentQuantity = existingItem ? existingItem.quantity : 0;
@@ -57,18 +59,11 @@ function ProductDetail({ product }: Props) {
       return;
     }
 
-    try {
-      await addItem({
-        productId: product.id,
-        quantity,
-      });
-      mutate();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
-    }
+    await addItem({
+      productId: product.id,
+      quantity,
+    });
   };
-
-  if (!product) return <ProductDetailSkeleton />;
 
   return (
     <section className="w-full mb-[40px] px-[15px]">
@@ -81,11 +76,11 @@ function ProductDetail({ product }: Props) {
           </div>
 
           <div className="relative flex-1" id="div2">
-            <div className="space-y-[10px] ">
+            <div className="space-y-[10px]">
               <h2 className="line-clamp-2">{product?.name}</h2>
 
               <div className="flex items-center gap-[15px]">
-                {product && product?.discount > 0 ? (
+                {product?.discount > 0 ? (
                   <>
                     <del className="text-[#707072] font-light text-[1.4rem]">
                       {product?.price.toLocaleString("vi-VN")}₫
@@ -110,7 +105,7 @@ function ProductDetail({ product }: Props) {
               </div>
 
               <div className="space-y-[15px]">
-                {product && product.stock > 0 ? (
+                {product?.stock ? (
                   <>
                     <div className="w-full flex items-center gap-[15px]">
                       <h5 className="font-medium">Số lượng:</h5>
@@ -167,7 +162,8 @@ function ProductDetail({ product }: Props) {
                 )}
 
                 <ProductInformation
-                  category={product.category}
+                  categoryName={product.category.name}
+                  brandName={product.brand.name}
                   specifications={product.specifications}
                 />
 

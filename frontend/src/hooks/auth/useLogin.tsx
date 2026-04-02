@@ -3,9 +3,13 @@ import Cookies from "js-cookie";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import useGetAccount from "./useGetAccount";
+import type { ApiResponse, LoginResponse } from "../../types/type";
 
 export default function useLogin() {
   const [isLoading, setIsLoading] = useState(false);
+  const { mutate: mutateAccountCustomer } = useGetAccount("customer");
+  const { mutate: mutateAccountAdmin } = useGetAccount("admin");
   const navigate = useNavigate();
 
   const handleLogin = async (data: { email: string; password: string }) => {
@@ -15,8 +19,12 @@ export default function useLogin() {
 
     try {
       const url = `${import.meta.env.VITE_BACKEND_URL}/auth/login`;
-      const { data: res } = await axios.post(url, data);
-      const { token, role } = res;
+      const { data: res } = await axios.post<ApiResponse<LoginResponse>>(
+        url,
+        data,
+      );
+
+      const { token, role } = res.data;
 
       const isAdminPage = window.location.pathname.startsWith("/admin");
 
@@ -47,10 +55,16 @@ export default function useLogin() {
         secure: import.meta.env.VITE_ENV === "production",
       });
 
+      if (role === "admin") {
+        await mutateAccountAdmin();
+      } else {
+        await mutateAccountCustomer();
+      }
 
+      toast.success(res.message);
       navigate(role === "admin" ? "/admin/account/profile" : "/");
-    } catch (err) {
-      console.error("Lỗi:", err);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message);
       throw err;
     } finally {
       setIsLoading(false);

@@ -13,6 +13,8 @@ import com.backend.brand_service.entity.Brand;
 public interface BrandRepository extends JpaRepository<Brand, String> {
     Optional<Brand> findByName(String name);
 
+    Optional<Brand> findBySlug(String slug);
+
     List<Brand> findByStatus(Integer status);
 
     Page<Brand> findByNameContainingIgnoreCase(String q, Pageable pageable);

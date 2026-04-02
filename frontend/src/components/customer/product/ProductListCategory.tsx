@@ -14,7 +14,7 @@ function ProductListCategory() {
       href: "/",
     },
     {
-      name: slug === "all" ? "Tất cả sản phẩm" : products[0]?.category?.name,
+      name: slug === "all" ? "Tất cả sản phẩm" : products[0]?.categoryName,
     },
   ];
   return (
@@ -25,7 +25,7 @@ function ProductListCategory() {
           <ProductList
             products={products}
             title={
-              slug === "all" ? "Tất cả sản phẩm" : products[0]?.category?.name
+              slug === "all" ? "Tất cả sản phẩm" : products[0]?.categoryName
             }
             isLoading={isLoading}
             total={totalItems}

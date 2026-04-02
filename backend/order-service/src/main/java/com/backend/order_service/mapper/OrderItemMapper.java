@@ -6,7 +6,7 @@ import java.util.List;
 import com.backend.order_service.dto.request.OrderItemRequest;
 import com.backend.order_service.dto.response.ImageProductResponse;
 import com.backend.order_service.dto.response.OrderItemResponse;
-import com.backend.order_service.dto.response.ProductResponse;
+import com.backend.order_service.dto.response.ProductListItemResponse;
 import com.backend.order_service.entity.Order;
 import com.backend.order_service.entity.OrderItem;
 
@@ -46,7 +46,7 @@ public final class OrderItemMapper {
 
         public static OrderItemResponse toResponse(
                         OrderItem item,
-                        ProductResponse product) {
+                        ProductListItemResponse product) {
 
                 return OrderItemResponse.builder()
                                 .id(item.getId())

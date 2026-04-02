@@ -3,10 +3,11 @@ import { LuSendHorizontal } from "react-icons/lu";
 
 type Props = {
   textLength: number;
+  isLoading: boolean;
 };
 
-function ChatButton({ textLength }: Props) {
-  const isDisabled = textLength === 0 || textLength > 1000; 
+function ChatButton({ textLength, isLoading }: Props) {
+  const isDisabled = textLength === 0 || textLength > 1000 || isLoading;
   return (
     <button
       disabled={isDisabled}

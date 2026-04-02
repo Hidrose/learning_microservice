@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import type { ProductResponse } from "../../../types/type";
+import type { ProductListItemResponse } from "../../../types/type";
 import Image from "../../ui/Image";
 import ProductCard from "./ProductCard";
 import { memo } from "react";
@@ -7,7 +7,7 @@ import ProductListSkeleton from "../skeleton/ProductListSkeleton";
 
 interface Props {
   title?: string;
-  products: ProductResponse[];
+  products: ProductListItemResponse[];
   isLoading: boolean;
   total: number;
 }
@@ -56,12 +56,9 @@ function ProductList({ title, products, isLoading = false, total }: Props) {
       <div className="mb-[40px] space-y-[15px]">
         <div className="flex justify-between items-center flex-wrap gap-[15px]">
           <h2 className="text-black">
-            {isLoading
-              ? "Đang tải sản phẩm..."
-              : search
-                ? `Kết quả cho "${search}"`
-                : title}
-            {!isLoading && ` (${total})`}
+            {isLoading && "Đang tải sản phẩm..."}
+            {!isLoading && search && `Kết quả cho "${search}"`}
+            {!isLoading && !search && `${title ?? "Không tìm thấy"} (${total})`}
           </h2>
 
           <select

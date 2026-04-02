@@ -11,8 +11,8 @@ import com.backend.payment_service.dto.request.PaymentRequest;
 import com.backend.payment_service.dto.response.MomoResponse;
 import com.backend.payment_service.dto.response.OrderResponse;
 import com.backend.payment_service.dto.response.PaymentResponse;
-import com.backend.payment_service.exception.ExternalServiceException;
-import com.backend.payment_service.exception.NotFoundException;
+import com.backend.payment_service.exception.AppException;
+import com.backend.payment_service.exception.ErrorCode;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -128,7 +128,7 @@ public class MomoService {
         Map<String, Object> response = restTemplate.postForObject(refundUrl, requestBody, Map.class);
 
         if (!"0".equals(String.valueOf(response.get("resultCode")))) {
-            throw new ExternalServiceException("Hoàn tiền Momo thất bại: " + response);
+            throw new AppException(ErrorCode.MOMO_REFUND_FAILED);
         }
     }
 
@@ -155,7 +155,7 @@ public class MomoService {
         OrderResponse order = orderServiceClient.getOrderByOrderCodeInternal(orderCode);
 
         if (order == null) {
-            throw new NotFoundException("Đơn hàng không tìm thấy");
+            throw new AppException(ErrorCode.ORDER_NOT_FOUND);
         }
 
         if (order.getStatus() != -1) {

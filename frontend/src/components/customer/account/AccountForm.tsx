@@ -47,21 +47,17 @@ function AccountForm() {
       return;
     }
 
-    try {
-      await updateUser({
-        fullname: data.fullname.trim(),
-        email: data.email.trim(),
-        phone: data.phone.trim(),
-        gender: data.gender,
-        birthDate: data.birthDate,
-      });
-      setData((prev) => ({
-        ...prev,
-        password: "",
-      }));
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
-    }
+    await updateUser({
+      fullname: data.fullname.trim(),
+      email: data.email.trim(),
+      phone: data.phone.trim(),
+      gender: data.gender,
+      birthDate: data.birthDate,
+    });
+    setData((prev) => ({
+      ...prev,
+      password: "",
+    }));
   };
 
   return (

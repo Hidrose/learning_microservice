@@ -5,10 +5,18 @@ import java.util.stream.Collectors;
 
 import com.backend.product_service.dto.request.ProductRequest;
 import com.backend.product_service.dto.response.BrandResponse;
+import com.backend.product_service.dto.response.BrandSimpleResponse;
 import com.backend.product_service.dto.response.CategoryResponse;
-import com.backend.product_service.dto.response.ProductResponse;
+import com.backend.product_service.dto.response.CategorySimpleResponse;
+import com.backend.product_service.dto.response.ImageProductResponse;
+import com.backend.product_service.dto.response.ProductAssistantResponse;
+import com.backend.product_service.dto.response.ProductDetailResponse;
+import com.backend.product_service.dto.response.ProductListItemResponse;
+import com.backend.product_service.dto.response.SpecificationResponse;
 import com.backend.product_service.entity.ImageProduct;
 import com.backend.product_service.entity.Product;
+import com.backend.product_service.entity.Specification;
+
 import java.util.Comparator;
 
 public final class ProductMapper {
@@ -31,13 +39,6 @@ public final class ProductMapper {
                                 .brandId(request.getBrandId())
                                 .build();
 
-                if (request.getImages() != null) {
-                        product.setImages(
-                                        request.getImages().stream()
-                                                        .map(ImageProductMapper::toEntity)
-                                                        .collect(Collectors.toSet()));
-                }
-
                 if (request.getSpecifications() != null) {
                         product.setSpecifications(
                                         request.getSpecifications().stream()
@@ -49,7 +50,6 @@ public final class ProductMapper {
         }
 
         public static void updateEntity(Product product, ProductRequest request) {
-
                 product.setName(request.getName());
                 product.setPrice(request.getPrice());
                 product.setDiscount(request.getDiscount());
@@ -60,9 +60,47 @@ public final class ProductMapper {
                 product.setBrandId(request.getBrandId());
         }
 
-        public static ProductResponse toResponse(Product product) {
+        public static ProductListItemResponse toListItemResponse(
+                        Product product,
+                        CategoryResponse category,
+                        BrandResponse brand) {
 
-                return ProductResponse.builder()
+                return ProductListItemResponse.builder()
+                                .id(product.getId())
+                                .name(product.getName())
+                                .slug(product.getSlug())
+                                .price(product.getPrice())
+                                .discount(product.getDiscount())
+                                .finalPrice(product.getFinalPrice())
+                                .stock(product.getStock())
+                                .status(product.getStatus())
+                                .totalSold(product.getTotalSold())
+                                .categoryName(category != null ? category.getName() : null)
+                                .brandName(brand != null ? brand.getName() : null)
+                                .images(mapImages(product))
+                                .build();
+        }
+
+        public static ProductDetailResponse toDetailResponse(
+                        Product product,
+                        CategoryResponse category,
+                        BrandResponse brand) {
+
+                CategorySimpleResponse categorySimple = category == null ? null
+                                : CategorySimpleResponse.builder()
+                                                .id(category.getId())
+                                                .name(category.getName())
+                                                .slug(category.getSlug())
+                                                .build();
+
+                BrandSimpleResponse brandSimple = brand == null ? null
+                                : BrandSimpleResponse.builder()
+                                                .id(brand.getId())
+                                                .name(brand.getName())
+                                                .slug(brand.getSlug())
+                                                .build();
+
+                return ProductDetailResponse.builder()
                                 .id(product.getId())
                                 .name(product.getName())
                                 .slug(product.getSlug())
@@ -72,36 +110,46 @@ public final class ProductMapper {
                                 .description(product.getDescription())
                                 .status(product.getStatus())
                                 .stock(product.getStock())
-                                .totalSold(product.getTotalSold())
-                                .images(
-                                                product.getImages() == null
-                                                                ? List.of()
-                                                                : product.getImages().stream()
-                                                                                .sorted(
-                                                                                                Comparator.comparing(
-                                                                                                                ImageProduct::getCreatedAt,
-                                                                                                                Comparator.nullsLast(
-                                                                                                                                Comparator.naturalOrder())))
-
-                                                                                .map(ImageProductMapper::toResponse)
-                                                                                .toList())
-                                .specifications(
-                                                product.getSpecifications() == null
-                                                                ? List.of()
-                                                                : product.getSpecifications().stream()
-                                                                                .map(SpecificationMapper::toResponse)
-                                                                                .toList())
+                                .category(categorySimple)
+                                .brand(brandSimple)
+                                .images(mapImages(product))
+                                .specifications(mapSpecifications(product))
                                 .build();
         }
 
-        public static ProductResponse toResponse(
+        private static List<ImageProductResponse> mapImages(Product product) {
+                if (product.getImages() == null)
+                        return List.of();
+                return product.getImages().stream()
+                                .sorted(Comparator.comparing(
+                                                ImageProduct::getDisplayOrder,
+                                                Comparator.nullsLast(Comparator.naturalOrder())))
+                                .map(ImageProductMapper::toResponse)
+                                .toList();
+        }
+
+        private static List<SpecificationResponse> mapSpecifications(Product product) {
+                if (product.getSpecifications() == null)
+                        return List.of();
+                return product.getSpecifications().stream()
+                                .sorted(Comparator.comparing(
+                                                Specification::getDisplayOrder,
+                                                Comparator.nullsLast(Comparator.naturalOrder())))
+                                .map(SpecificationMapper::toResponse)
+                                .toList();
+        }
+
+        public static ProductAssistantResponse toAssistantResponse(
                         Product product,
                         CategoryResponse category,
                         BrandResponse brand) {
 
-                ProductResponse response = toResponse(product);
-                response.setCategory(category);
-                response.setBrand(brand);
-                return response;
+                return ProductAssistantResponse.builder()
+                                .id(product.getId())
+                                .name(product.getName())
+                                .finalPrice(product.getFinalPrice())
+                                .categoryName(category != null ? category.getName() : null)
+                                .brandName(brand != null ? brand.getName() : null)
+                                .build();
         }
 }

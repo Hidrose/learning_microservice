@@ -1,6 +1,6 @@
 import axios from "axios";
 import useSWR from "swr";
-import type { CartResponse } from "../../../types/type";
+import type { ApiResponse, CartResponse } from "../../../types/type";
 import { getCookie } from "../../../utils/cookieUtil";
 
 export default function useGetCart() {
@@ -17,7 +17,7 @@ export default function useGetCart() {
       })
       .then((res) => res.data);
 
-  const { data, error, isLoading, mutate } = useSWR<CartResponse>(
+  const { data, error, isLoading, mutate } = useSWR<ApiResponse<CartResponse>>(
     url,
     fetcher,
     {
@@ -27,7 +27,7 @@ export default function useGetCart() {
   );
 
   return {
-    cart: data,
+    cart: data?.data,
     isLoading,
     error,
     mutate,

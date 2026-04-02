@@ -27,7 +27,7 @@ function CheckoutForm() {
   const [isOrderPlaced, setIsOrderPlaced] = useState<boolean>(false);
 
   const { provinces } = useGetProvinces();
-  const { cart, isLoading: isLoadingCart, mutate: mutateCart } = useGetCart();
+  const { cart, isLoading: isLoadingCart } = useGetCart();
   const { addOrder, isLoading: isLoadingOrder } = useAddOrder();
   const { createPaymentMomo, isLoading: isLoadingPaymentMomo } =
     usePaymentMomo();
@@ -44,7 +44,7 @@ function CheckoutForm() {
   }, [cart?.items]);
 
   useEffect(() => {
-    if (isOrderPlaced) return;
+    if (isOrderPlaced || isLoadingOrder) return;
 
     if (isLoadingCart) return;
 
@@ -55,14 +55,12 @@ function CheckoutForm() {
     }
 
     if (outOfStockItems.length > 0) {
-      toast.error(
-        "Một số sản phẩm không đủ hàng so với số lượng bạn muốn mua trong giỏ hàng",
-      );
+      toast.error("Một số sản phẩm không đủ hàng");
       navigate("/cart");
     }
 
     if (unavailableItems.length > 0) {
-      toast.error("Một số sản phẩm đang tạm ngừng bán trong giỏ hàng");
+      toast.error("Một số sản phẩm đang tạm ngừng bán");
       navigate("/cart");
     }
   }, [
@@ -72,6 +70,7 @@ function CheckoutForm() {
     navigate,
     isOrderPlaced,
     isLoadingCart,
+    isLoadingOrder,
   ]);
 
   const totalPrice = useMemo(() => {
@@ -131,21 +130,25 @@ function CheckoutForm() {
 
     const orderPayload = { ...data, paymethod, items };
 
+    const res = await addOrder(orderPayload);
+
+    if (!res?.orderCode) {
+      toast.error("Không lấy được mã đơn hàng");
+      return;
+    }
     setIsOrderPlaced(true);
 
-    try {
-      const res = await addOrder(orderPayload);
+    if (paymethod === "cod") {
+      navigate("/order-result?result=successful");
+    } else {
+      const momoResponse = await createPaymentMomo(res.orderCode);
 
-      if (paymethod === "cod") {
-        navigate("/order-result?result=successful");
-        mutateCart({ items: [] }, false);
-      } else {
-        const momoResponse = await createPaymentMomo(res.orderCode);
-        window.location.href = momoResponse.payUrl;
+      if (!momoResponse?.payUrl) {
+        toast.error("Không lấy được link thanh toán Momo");
+        return;
       }
-    } catch (err: any) {
-      setIsOrderPlaced(false);
-      toast.error(err?.response?.data?.message);
+
+      window.location.href = momoResponse.payUrl;
     }
   };
 

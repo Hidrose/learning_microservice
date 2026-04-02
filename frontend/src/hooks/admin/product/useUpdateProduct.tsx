@@ -2,10 +2,12 @@ import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import type { ProductRequest } from "../../../types/type";
+import useGetProduct from "./useGetProduct";
 
 export default function useUpdateProduct(id: string) {
   const [isLoading, setIsLoading] = useState(false);
-  const updateProduct = async (data: ProductRequest) => {
+  const { mutate } = useGetProduct(id);
+  const updateProduct = async (data: ProductRequest, files: File[]) => {
     if (!id) return;
     const loadingToast = toast.loading("Đang cập nhật...");
     setIsLoading(true);
@@ -33,21 +35,20 @@ export default function useUpdateProduct(id: string) {
         ),
       );
 
-      if (data.images && data.images.length > 0) {
-        data.images.forEach((file) => {
-          formData.append("images", file);
-        });
-      }
+      files.forEach((file) => {
+        formData.append("images", file);
+      });
 
-      await axios.put(url, formData, {
+      const res = await axios.put(url, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+      await mutate();
       toast.dismiss(loadingToast);
-      toast.success("Cập nhật thành công");
-    } catch (err) {
-      console.error("Lỗi:", err);
+      toast.success(res.data?.message);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message);
       throw err;
     } finally {
       toast.dismiss(loadingToast);

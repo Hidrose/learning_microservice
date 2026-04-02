@@ -19,7 +19,7 @@ function EditAdmin() {
   });
 
   const { account } = useGetAccount("admin");
-  const { user, isLoading, mutate } = useGetUser(id as string);
+  const { user, isLoading } = useGetUser(id as string);
   const { updateUser, isLoading: isLoadingUpdate } = useUpdateUser(
     id as string,
   );
@@ -40,8 +40,6 @@ function EditAdmin() {
       phone: user.phone || "",
       status: user.status?.toString() || "",
     });
-
-    mutate();
   }, [isLoading, user, navigate]);
 
   const handleChange = (
@@ -76,30 +74,24 @@ function EditAdmin() {
       return;
     }
 
-    try {
-      const payload: any = {
-        fullname: data.fullname.trim(),
-        phone: data.phone.trim(),
-        email: data.email.trim(),
-        role: "admin",
-        status: Number(data.status),
-      };
+    const payload: any = {
+      fullname: data.fullname.trim(),
+      phone: data.phone.trim(),
+      email: data.email.trim(),
+      role: "admin",
+      status: Number(data.status),
+    };
 
-      if (data.password.trim()) {
-        payload.password = data.password.trim();
-      }
-
-      await updateUser(payload);
-
-      mutate();
-
-      setData((prev) => ({
-        ...prev,
-        password: "",
-      }));
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
+    if (data.password.trim()) {
+      payload.password = data.password.trim();
     }
+
+    await updateUser(payload);
+
+    setData((prev) => ({
+      ...prev,
+      password: "",
+    }));
   };
 
   return (

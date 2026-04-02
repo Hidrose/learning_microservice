@@ -1,7 +1,12 @@
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import Image from "../../ui/Image";
 import { HiMiniXMark } from "react-icons/hi2";
 import ImageViewer from "../../ui/ImageViewer";
+import { ReactSortable } from "react-sortablejs";
+type SortableImage = {
+  id: string;
+  url: string;
+};
 
 type Props = {
   InputId: string;
@@ -11,6 +16,7 @@ type Props = {
     blockIndex: number,
   ) => void;
   onRemovePreviewImage: (index: number, blockIndex: number) => void;
+  onReorderImages: (orderedUrls: string[]) => void;
   blockIndex: number;
 };
 function InputImage({
@@ -18,10 +24,20 @@ function InputImage({
   previewImages,
   onPreviewImage,
   onRemovePreviewImage,
+  onReorderImages,
   blockIndex,
 }: Props) {
   const [openViewer, setOpenViewer] = useState<boolean>(false);
   const [viewerImage, setViewerImage] = useState<string>("");
+
+  const [sortableItems, setSortableItems] = useState<SortableImage[]>([]);
+
+  useEffect(() => {
+    setSortableItems((prev) => {
+      if (prev.length === previewImages.length) return prev;
+      return previewImages.map((url) => ({ id: url, url }));
+    });
+  }, [previewImages]);
 
   const handleOpenViewer = (image: string) => {
     setViewerImage(image);
@@ -55,19 +71,31 @@ function InputImage({
             <p>PNG, JPG, WEBP</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-4 grid-cols-2 gap-3 items-center h-70 overflow-y-auto">
-            {previewImages.map((image, index) => (
-              <div className=" relative" key={index}>
+          <ReactSortable
+            list={sortableItems}
+            setList={(newItems) => {
+              setSortableItems(newItems);
+              onReorderImages(newItems.map((item) => item.url));
+            }}
+            animation={200}
+            className="grid md:grid-cols-4 grid-cols-2 gap-3 items-center h-70 overflow-y-auto"
+          >
+            {sortableItems.map((item, index) => (
+              <div
+                className=" relative"
+                key={item.id}
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div
                   className="cursor-pointer"
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
-                    handleOpenViewer(image);
+                    handleOpenViewer(item.url);
                   }}
                 >
                   <Image
-                    source={image}
+                    source={item.url}
                     alt={`preview-${index}`}
                     className="w-[150px]"
                     loading="eager"
@@ -89,7 +117,7 @@ function InputImage({
                 </div>
               </div>
             ))}
-          </div>
+          </ReactSortable>
         )}
 
         <input

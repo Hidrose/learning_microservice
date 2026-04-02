@@ -67,27 +67,24 @@ function RegisterModal({ onClose, onSwitchLogin }: Props) {
         toast.error("Mật khẩu phải có ít nhất 6 ký tự");
         return;
       }
-      try {
-        await handleRegister(
-          {
-            fullname: data.fullname.trim(),
-            email: data.email.toLowerCase().trim(),
-            phone: data.phone.trim(),
-            password: data.password.trim(),
-          },
-          data.otp.trim(),
-        );
 
-        setData({
-          fullname: "",
-          email: "",
-          password: "",
-          phone: "",
-          otp: "",
-        });
-      } catch (err: any) {
-        toast.error(err?.response?.data?.message);
-      }
+      await handleRegister(
+        {
+          fullname: data.fullname.trim(),
+          email: data.email.toLowerCase().trim(),
+          phone: data.phone.trim(),
+          password: data.password.trim(),
+        },
+        data.otp.trim(),
+      );
+
+      setData({
+        fullname: "",
+        email: "",
+        password: "",
+        phone: "",
+        otp: "",
+      });
     }
   };
 
@@ -97,11 +94,7 @@ function RegisterModal({ onClose, onSwitchLogin }: Props) {
       return;
     }
 
-    try {
-      await sendRegisterOTP(data.email.trim());
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
-    }
+    await sendRegisterOTP(data.email.trim());
   };
 
   return (

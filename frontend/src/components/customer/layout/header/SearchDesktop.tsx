@@ -1,7 +1,7 @@
 import { memo, useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { useNavigate, useLocation } from "react-router-dom";
-import Suggestion from "../../ui/Suggestion";
+import SuggestionProduct from "../../ui/SuggestionProduct";
 
 function SearchDesktop() {
   const navigate = useNavigate();
@@ -58,7 +58,7 @@ function SearchDesktop() {
 
       {focused && search && (
         <div className="absolute top-[110%] left-0 w-full z-20 bg-white shadow-lg border border-gray-100 rounded-md py-2">
-          <Suggestion search={search} />
+          <SuggestionProduct search={search} />
         </div>
       )}
     </div>

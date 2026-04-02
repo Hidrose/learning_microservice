@@ -1,13 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import useSWR from "swr";
-import type { PaymentResponse } from "../../../types/type";
-
-interface ResponseType {
-  payments: PaymentResponse[];
-  totalPages: number;
-  total: number;
-}
+import type { ApiResponse, PaymentResponse } from "../../../types/type";
 
 const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
@@ -25,21 +19,17 @@ export default function useGetPayments() {
   if (q) query.set("q", q || "");
   if (status) query.set("status", status.toString());
 
-  const url = `${
-    import.meta.env.VITE_BACKEND_URL
-  }/payment?${query.toString()}`;
+  const url = `${import.meta.env.VITE_BACKEND_URL}/payment?${query.toString()}`;
 
-  const { data, error, isLoading, mutate } = useSWR<ResponseType>(
-    url,
-    fetcher,
-    {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false,
-    }
-  );
+  const { data, error, isLoading, mutate } = useSWR<
+    ApiResponse<PaymentResponse[]>
+  >(url, fetcher, {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+  });
 
   return {
-    payments: data?.payments ?? [],
+    payments: data?.data ?? [],
     totalPages: data?.totalPages || 1,
     totalItems: data?.total || 0,
     currentPage: page,

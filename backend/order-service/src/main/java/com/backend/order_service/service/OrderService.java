@@ -15,11 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.backend.order_service.dto.request.OrderRequest;
 import com.backend.order_service.dto.request.StockRequest;
 import com.backend.order_service.dto.response.OrderResponse;
-import com.backend.order_service.dto.response.ProductResponse;
+import com.backend.order_service.dto.response.ProductListItemResponse;
 import com.backend.order_service.entity.Order;
 import com.backend.order_service.entity.OrderItem;
-import com.backend.order_service.exception.BadRequestException;
-import com.backend.order_service.exception.NotFoundException;
+import com.backend.order_service.exception.AppException;
+import com.backend.order_service.exception.ErrorCode;
 import com.backend.order_service.mapper.OrderMapper;
 import com.backend.order_service.repository.OrderRepository;
 import com.backend.order_service.utils.ValidationUtils;
@@ -182,7 +182,7 @@ public class OrderService {
         public OrderResponse getOrderById(String id) {
 
                 Order order = orderRepository.findById(id)
-                                .orElseThrow(() -> new NotFoundException("Đơn hàng không tìm thấy"));
+                                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
                 return mapWithClient(order);
         }
@@ -191,7 +191,7 @@ public class OrderService {
         public OrderResponse getOrderByOrderCode(String orderCode) {
 
                 Order order = orderRepository.findByOrderCode(orderCode)
-                                .orElseThrow(() -> new NotFoundException("Đơn hàng không tìm thấy"));
+                                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
                 return mapWithClient(order);
         }
@@ -203,8 +203,8 @@ public class OrderService {
 
                 Order order = orderRepository
                                 .findByOrderCodeAndUserId(orderCode, userId)
-                                .orElseThrow(() -> new NotFoundException(
-                                                "Đơn hàng không tồn tại hoặc không thuộc về bạn"));
+                                .orElseThrow(() -> new AppException(
+                                                ErrorCode.ORDER_NOT_BELONG_TO_USER));
 
                 return mapWithClient(order);
         }
@@ -216,7 +216,7 @@ public class OrderService {
                         String userId) {
 
                 if (!ValidationUtils.validatePhone(request.getPhone())) {
-                        throw new BadRequestException("Số điện thoại không hợp lệ");
+                        throw new AppException(ErrorCode.INVALID_PHONE);
                 }
 
                 String orderCode = generateOrderCode();
@@ -255,7 +255,7 @@ public class OrderService {
                         Integer status) {
 
                 Order order = orderRepository.findById(orderId)
-                                .orElseThrow(() -> new NotFoundException("Đơn hàng không tìm thấy"));
+                                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
                 Integer oldStatus = order.getStatus();
 
@@ -313,11 +313,11 @@ public class OrderService {
                                 .distinct()
                                 .toList();
 
-                List<ProductResponse> products = productServiceClient.getProductsByIdsInternal(productIds);
+                List<ProductListItemResponse> products = productServiceClient.getProductsByIdsInternal(productIds);
 
-                Map<String, ProductResponse> productMap = products.stream()
+                Map<String, ProductListItemResponse> productMap = products.stream()
                                 .collect(Collectors.toMap(
-                                                ProductResponse::getId,
+                                                ProductListItemResponse::getId,
                                                 p -> p));
 
                 return OrderMapper.toResponse(order, productMap);
@@ -335,7 +335,7 @@ public class OrderService {
         @Transactional
         public void deleteOrderByCode(String orderCode) {
                 Order order = orderRepository.findByOrderCode(orderCode)
-                                .orElseThrow(() -> new NotFoundException("Đơn hàng không tìm thấy"));
+                                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
                 orderRepository.delete(order);
         }
@@ -344,7 +344,7 @@ public class OrderService {
         public void confirmGatewayPayment(String orderCode) {
 
                 Order order = orderRepository.findByOrderCode(orderCode)
-                                .orElseThrow(() -> new NotFoundException("Đơn hàng không tìm thấy"));
+                                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
                 if (order.getStatus() != -1) {
                         return;

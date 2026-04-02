@@ -44,14 +44,14 @@ function EditProduct() {
 
   const max = 10;
 
-  const { product, isLoading, mutate } = useGetProduct(id as string);
+  const { product, isLoading } = useGetProduct(id as string);
   const { updateProduct, isLoading: isLoadingUpdate } = useUpdateProduct(
     id as string,
   );
   const { deleteImageProduct, isLoading: isLoadingDeleteImage } =
-    useDeleteImageProduct();
+    useDeleteImageProduct(product?.id || "");
   const { updateImageProduct, isLoading: isLoadingUpdateImage } =
-    useUpdateImageProduct();
+    useUpdateImageProduct(product?.id || "");
   const { categories } = useGetAllCategories();
   const { brands } = useGetAllBrands();
 
@@ -73,18 +73,17 @@ function EditProduct() {
     specifications,
     setSpecifications,
     addSpecification,
-    clearSpecifications,
     removeSpecification,
     updateSpecification,
   } = useSpecification();
 
   const {
     previewImages,
-    setPreviewImages,
-    selectedFiles,
-    setSelectedFiles,
     handlePreviewImage,
     handleRemovePreviewImage,
+    handleReorder,
+    getOrderedFiles,
+    clearImages,
   } = useInputImage(max);
 
   const {
@@ -150,23 +149,13 @@ function EditProduct() {
       return;
     }
 
-    try {
-      await deleteImageProduct(product!.id, imageId);
-      mutate();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
-    }
+    await deleteImageProduct(imageId);
   };
 
   const handleUpdateImage = async (imageId: string, file: File) => {
-    try {
-      await updateImageProduct(product!.id, imageId, file);
-      setPreviewImages1([]);
-      setSelectedFiles1([]);
-      mutate();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
-    }
+    await updateImageProduct(imageId, file);
+    setPreviewImages1([]);
+    setSelectedFiles1([]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -209,8 +198,16 @@ function EditProduct() {
       return;
     }
 
-    try {
-      await updateProduct({
+    const normalizedSpecifications = specifications.map((s) => ({
+      ...s,
+      specKey: s.specKey.trim(),
+      specValue: s.specValue.trim(),
+    }));
+
+    const orderedFiles = getOrderedFiles();
+
+    await updateProduct(
+      {
         name: data.name,
         price: data.price,
         discount: data.discount,
@@ -219,32 +216,27 @@ function EditProduct() {
         stock: data.stock,
         categoryId: data.category,
         brandId: data.brand,
-        images: selectedFiles,
-        specifications: specifications,
-      });
+        specifications: normalizedSpecifications,
+      },
+      orderedFiles,
+    );
 
-      if (selectedFiles1.length > 0) {
-        const newFiles = selectedFiles1.filter((f) => f !== null);
-        if (newFiles.length > 0) {
-          const oldImageIds = product?.images
-            .map((img, index) => (selectedFiles1[index] ? img.id : null))
-            .filter((id) => id !== null);
+    if (selectedFiles1.length > 0) {
+      const newFiles = selectedFiles1.filter((f) => f !== null);
+      if (newFiles.length > 0) {
+        const oldImageIds = product?.images
+          .map((img, index) => (selectedFiles1[index] ? img.id : null))
+          .filter((id) => id !== null);
 
-          const formData = new FormData();
-          selectedFiles1.forEach((file) => formData.append("files", file));
-          oldImageIds?.forEach((id) => formData.append("oldImageIds", id));
-        }
+        const formData = new FormData();
+        selectedFiles1.forEach((file) => formData.append("files", file));
+        oldImageIds?.forEach((id) => formData.append("oldImageIds", id));
       }
-
-      clearSpecifications();
-      mutate();
-      setPreviewImages([]);
-      setSelectedFiles([]);
-      setPreviewImages1([]);
-      setSelectedFiles1([]);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
     }
+
+    clearImages();
+    setPreviewImages1([]);
+    setSelectedFiles1([]);
   };
 
   return (
@@ -260,6 +252,7 @@ function EditProduct() {
                 previewImages={previewImages}
                 onPreviewImage={handlePreviewImage}
                 onRemovePreviewImage={handleRemovePreviewImage}
+                onReorderImages={handleReorder}
                 blockIndex={0}
               />
 

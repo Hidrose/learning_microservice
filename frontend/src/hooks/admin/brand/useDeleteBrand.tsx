@@ -2,9 +2,11 @@ import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
+import useGetBrands from "./useGetBrands";
 
 export default function useDeleteBrand() {
   const [isLoading, setIsLoading] = useState(false);
+  const { mutate } = useGetBrands();
   const deleteBrand = async (id: string) => {
     const result = await Swal.fire({
       title: `Xác nhận xóa?`,
@@ -23,11 +25,12 @@ export default function useDeleteBrand() {
 
     try {
       const url = `${import.meta.env.VITE_BACKEND_URL}/brand/${id}`;
-      await axios.delete(url);
+      const res = await axios.delete(url);
+      await mutate();
       toast.dismiss(loadingToast);
-      toast.success("Xóa thành công");
-    } catch (err) {
-      console.error("Lỗi:", err);
+      toast.success(res.data?.message);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message);
       throw err;
     } finally {
       toast.dismiss(loadingToast);

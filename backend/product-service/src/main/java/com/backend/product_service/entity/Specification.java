@@ -37,7 +37,7 @@ public class Specification {
     @Column(nullable = false, length = 100)
     private String specKey;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 300)
     private String specValue;
 
     @Column(nullable = false)

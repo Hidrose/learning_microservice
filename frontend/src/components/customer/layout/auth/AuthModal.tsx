@@ -2,33 +2,34 @@ import { memo } from "react";
 import Overplay from "../../ui/Overplay";
 import LoginModal from "./LoginModal";
 import RegisterModal from "./RegisterModal";
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState } from "../../../../redux/Store";
+import {
+  closeAuthModal,
+  switchAuthModal,
+} from "../../../../redux/slices/AuthModalSlice";
 
-type AuthType = "login" | "register" | null;
+function AuthModal() {
+  const type = useSelector((state: RootState) => state.authModal.type);
+  const dispatch = useDispatch();
 
-type Props = {
-  type: AuthType;
-  onClose: () => void;
-  onSwitch: (type: Exclude<AuthType, null>) => void;
-};
-
-function AuthModal({ type, onClose, onSwitch }: Props) {
   if (!type) return null;
 
   return (
     <>
       {type === "login" && (
         <LoginModal
-          onClose={onClose}
-          onSwitchRegister={() => onSwitch("register")}
+          onClose={() => dispatch(closeAuthModal())}
+          onSwitchRegister={() => dispatch(switchAuthModal("register"))}
         />
       )}
       {type === "register" && (
         <RegisterModal
-          onClose={onClose}
-          onSwitchLogin={() => onSwitch("login")}
+          onClose={() => dispatch(closeAuthModal())}
+          onSwitchLogin={() => dispatch(switchAuthModal("login"))}
         />
       )}
-      <Overplay onClose={onClose} IndexForZ={97} />
+      <Overplay onClose={() => dispatch(closeAuthModal())} IndexForZ={97} />
     </>
   );
 }

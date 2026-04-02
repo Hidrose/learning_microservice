@@ -11,10 +11,10 @@ export function useSendRegisterOTP() {
     setIsLoading(true);
     try {
       const url = `${import.meta.env.VITE_BACKEND_URL}/auth/otp?email=${email}`;
-      await axios.post(url);
-      toast.success("Gửi mã OTP thành công. Vui lòng kiểm tra email của bạn");
+      const res = await axios.post(url);
+      toast.success(res.data?.message);
     } catch (err: any) {
-      console.error("Lỗi:", err);
+      toast.error(err?.response?.data?.message);
       throw err;
     } finally {
       setIsLoading(false);

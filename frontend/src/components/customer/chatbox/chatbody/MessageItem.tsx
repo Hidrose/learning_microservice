@@ -3,26 +3,27 @@ import Image from "../../../ui/Image";
 import MessageAction from "./MessageAction";
 import { memo, useCallback } from "react";
 import MessageProductList from "./MessageProductList";
+import type { ProductListItemResponse } from "../../../../types/type";
 
 type props = {
-  type: "user" | "ai";
-  text: string;
-  products?: any[];
+  role: "ASSISTANT" | "USER";
+  content: string;
+  products?: ProductListItemResponse[];
 };
 
-function MessageItem({ type, text, products }: props) {
+function MessageItem({ role, content, products }: props) {
   const handleCopy = useCallback(async () => {
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(content);
     toast.success("Đã sao chép tin nhắn");
-  }, [text]);
+  }, [content]);
 
   return (
     <div
       className={`flex gap-2 ${
-        type === "ai" ? "justify-start" : "justify-end"
+        role === "ASSISTANT" ? "justify-start" : "justify-end"
       }`}
     >
-      {type === "ai" && (
+      {role === "ASSISTANT" && (
         <Image
           className="w-10 h-10 rounded-full self-start"
           source="/assets/troly.png"
@@ -33,23 +34,31 @@ function MessageItem({ type, text, products }: props) {
 
       <div
         className={`flex flex-col max-w-[75%] gap-2 ${
-          type === "ai" ? "items-start" : "items-end"
+          role === "ASSISTANT" ? "items-start" : "items-end"
         }`}
       >
         <div
-          className={`inline-block px-4 py-2 rounded-xl break-anywhere whitespace-pre-wrap   ${
-            type === "ai" ? "bg-gray-100 text-black" : "bg-primary text-white"
-          }
-      `}
+          className={`inline-block px-4 py-2 rounded-xl break-anywhere whitespace-pre-wrap ${
+            role === "ASSISTANT"
+              ? "bg-gray-100 text-black"
+              : "bg-primary text-white"
+          }`}
         >
-          {text}
+          {role === "ASSISTANT" ? (
+            <span
+              dangerouslySetInnerHTML={{ __html: content }}
+              className="[&_a]:text-primary [&_a]:underline"
+            />
+          ) : (
+            content
+          )}
         </div>
 
-        {type === "ai" && products && (
+        {role === "ASSISTANT" && products && (
           <MessageProductList products={products} />
         )}
 
-        {type === "ai" && <MessageAction onCopy={handleCopy} />}
+        <MessageAction onCopy={handleCopy} />
       </div>
     </div>
   );

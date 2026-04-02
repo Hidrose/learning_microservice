@@ -1,7 +1,7 @@
 import axios from "axios";
 import useSWR from "swr";
 import Cookies from "js-cookie";
-import type { UserResponse } from "../../types/type";
+import type { ApiResponse, UserResponse } from "../../types/type";
 
 const fetcher =
   (type: "admin" | "customer") =>
@@ -9,21 +9,17 @@ const fetcher =
     const token =
       type === "admin"
         ? Cookies.get("token-admin")
-        : type === "customer"
-          ? Cookies.get("token-customer")
-          : null;
+        : Cookies.get("token-customer");
 
-    if (!token) {
-      throw new Error("Token không tìm thấy");
-    }
+    if (!token) throw new Error("Token không tìm thấy");
 
-    const res = await axios.get<UserResponse>(url, {
+    const res = await axios.get<ApiResponse<UserResponse>>(url, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    return res.data;
+    return res.data.data;
   };
 
 export default function useGetAccount(type: "admin" | "customer") {

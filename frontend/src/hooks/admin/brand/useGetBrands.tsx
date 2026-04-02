@@ -1,13 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import useSWR from "swr";
-import type { BrandResponse } from "../../../types/type";
-
-interface ResponseType {
-  brands: BrandResponse[];
-  totalPages: number;
-  total: number;
-}
+import type { ApiResponse, BrandResponse } from "../../../types/type";
 
 const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
@@ -27,17 +21,15 @@ export default function useGetBrands() {
 
   const url = `${import.meta.env.VITE_BACKEND_URL}/brand?${query.toString()}`;
 
-  const { data, error, isLoading, mutate } = useSWR<ResponseType>(
-    url,
-    fetcher,
-    {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false,
-    },
-  );
+  const { data, error, isLoading, mutate } = useSWR<
+    ApiResponse<BrandResponse[]>
+  >(url, fetcher, {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+  });
 
   return {
-    brands: data?.brands ?? [],
+    brands: data?.data ?? [],
     totalPages: data?.totalPages || 1,
     totalItems: data?.total || 0,
     currentPage: page,

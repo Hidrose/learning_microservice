@@ -18,10 +18,8 @@ import com.backend.category_service.client.ProductServiceClient;
 import com.backend.category_service.dto.request.CategoryRequest;
 import com.backend.category_service.dto.response.CategoryResponse;
 import com.backend.category_service.entity.Category;
-import com.backend.category_service.exception.BadRequestException;
-import com.backend.category_service.exception.ConflictException;
-import com.backend.category_service.exception.ExternalServiceException;
-import com.backend.category_service.exception.NotFoundException;
+import com.backend.category_service.exception.AppException;
+import com.backend.category_service.exception.ErrorCode;
 import com.backend.category_service.mapper.CategoryMapper;
 import com.backend.category_service.repository.CategoryRepository;
 import com.backend.category_service.utils.SlugUtil;
@@ -87,7 +85,7 @@ public class CategoryService {
     // lấy 1 category theo id
     public CategoryResponse getCategoryById(String id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Danh mục không tìm thấy"));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
         return CategoryMapper.toResponse(category);
     }
@@ -95,21 +93,21 @@ public class CategoryService {
     // lấy 1 category theo slug
     public CategoryResponse getCategoryBySlug(String slug) {
         Category category = categoryRepository.findBySlug(slug)
-                .orElseThrow(() -> new NotFoundException("Danh mục không tìm thấy"));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
         return CategoryMapper.toResponse(category);
     }
 
     // thêm category
     @Transactional
-    public CategoryResponse createCategory(CategoryRequest request, MultipartFile image) {
+    public void createCategory(CategoryRequest request, MultipartFile image) {
 
         if (categoryRepository.existsByName(request.getName())) {
-            throw new ConflictException("Tên danh mục đã được sử dụng");
+            throw new AppException(ErrorCode.CATEGORY_NAME_EXISTS);
         }
 
         if (image == null || image.isEmpty()) {
-            throw new BadRequestException("Hình ảnh không được để trống");
+            throw new AppException(ErrorCode.IMAGE_REQUIRED);
         }
 
         Category category = CategoryMapper.toEntity(request);
@@ -127,24 +125,22 @@ public class CategoryService {
         saved.setImage(imageUrl);
 
         categoryRepository.save(saved);
-
-        return CategoryMapper.toResponse(saved);
     }
 
     // cập nhật category
     @Transactional
-    public CategoryResponse updateCategory(
+    public void updateCategory(
             String id,
             CategoryRequest request,
             MultipartFile image) {
 
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Danh mục không tìm thấy"));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
         categoryRepository.findByName(request.getName())
                 .filter(c -> !c.getId().equals(id))
                 .ifPresent(c -> {
-                    throw new ConflictException("Tên danh mục đã được sử dụng");
+                    throw new AppException(ErrorCode.CATEGORY_NAME_EXISTS);
                 });
 
         CategoryMapper.updateEntity(category, request);
@@ -154,16 +150,14 @@ public class CategoryService {
             String imageUrl = uploadImageOnCloudinary(image, category.getId());
             category.setImage(imageUrl);
         }
-
-        return CategoryMapper.toResponse(category);
     }
 
     // cập nhật status
     @Transactional
-    public CategoryResponse updateCategoryStatus(String id, Integer status) {
+    public void updateCategoryStatus(String id, Integer status) {
 
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Danh mục không tìm thấy"));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
         category.setStatus(status);
         categoryRepository.save(category);
@@ -172,8 +166,6 @@ public class CategoryService {
         if (Objects.equals(status, 0)) {
             productServiceClient.hideProductsByCategoryInternal(id);
         }
-
-        return CategoryMapper.toResponse(category);
     }
 
     // xóa category
@@ -181,13 +173,13 @@ public class CategoryService {
     public void deleteCategory(String id) {
 
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Danh mục không tìm thấy"));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
         Boolean isUsed = productServiceClient.existsProductByCategoryIdInternal(id);
 
         if (Boolean.TRUE.equals(isUsed)) {
-            throw new ConflictException(
-                    "Danh mục này không thể xóa vì đang được sử dụng bởi sản phẩm");
+            throw new AppException(
+                    ErrorCode.CATEGORY_IN_USE);
         }
 
         deleteFolderOnCloudinary(category.getId());
@@ -217,7 +209,7 @@ public class CategoryService {
                     ObjectUtils.emptyMap());
 
         } catch (Exception e) {
-            throw new ExternalServiceException("Xóa hình thất bại" + e);
+            throw new AppException(ErrorCode.IMAGE_DELETE_FAILED);
         }
     }
 
@@ -225,7 +217,7 @@ public class CategoryService {
 
         // validate size (2MB)
         if (file.getSize() > 2 * 1024 * 1024) {
-            throw new BadRequestException("Dung lượng hình tối đa 2MB");
+            throw new AppException(ErrorCode.IMAGE_TOO_LARGE);
         }
 
         // validate type
@@ -237,7 +229,7 @@ public class CategoryService {
                 "image/svg+xml");
 
         if (contentType == null || !allowedTypes.contains(contentType)) {
-            throw new BadRequestException("Hình chỉ cho phép JPG, PNG, WEBP, SVG");
+            throw new AppException(ErrorCode.IMAGE_INVALID_TYPE);
         }
 
         try {
@@ -252,7 +244,7 @@ public class CategoryService {
             return uploadResult.get("secure_url").toString();
 
         } catch (IOException e) {
-            throw new ExternalServiceException("Upload hình thất bại" + e);
+            throw new AppException(ErrorCode.IMAGE_UPLOAD_FAILED);
         }
     }
 

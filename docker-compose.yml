@@ -197,10 +197,13 @@ services:
     environment:
       EUREKA_URL: http://eureka-server:8761/eureka
       JWT_SECRET: d1b72a9c2f1b2cfd6eb0b9320491ec2f
+      N8N_URL: http://n8n:5678
       JAVA_TOOL_OPTIONS: "-Xms64m -Xmx192m"
     depends_on:
       eureka-server:
         condition: service_healthy
+      n8n:
+        condition: service_started
     restart: on-failure
 
   api-gateway:
@@ -218,3 +221,24 @@ services:
       eureka-server:
         condition: service_healthy
     restart: on-failure
+
+  n8n:
+    image: n8nio/n8n
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    networks:
+      - app-network
+    environment:
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_RUNNERS_ENABLED=false
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_HIRING_BANNER_ENABLED=false
+    volumes:
+      - ./n8n:/home/node/.n8n
+    restart: always
+
+volumes:
+  n8n_data:

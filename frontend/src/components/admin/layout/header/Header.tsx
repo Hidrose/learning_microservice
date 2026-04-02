@@ -25,7 +25,7 @@ function Header({ onToggleMenu }: Props) {
   };
   return (
     <>
-      <header className="sticky top-0 z-10 flex w-full bg-white border-b-gray-200 items-center border-b">
+      <header className="sticky top-0 z-10 flex w-full bg-white border-b-gray-200 items-center border-b font-medium">
         <div className="w-full flex justify-between items-center sm:px-[20px] py-3.5 px-[15px]">
           <button
             onClick={onToggleMenu}

@@ -17,8 +17,8 @@ import com.backend.brand_service.client.ProductServiceClient;
 import com.backend.brand_service.dto.request.BrandRequest;
 import com.backend.brand_service.dto.response.BrandResponse;
 import com.backend.brand_service.entity.Brand;
-import com.backend.brand_service.exception.ConflictException;
-import com.backend.brand_service.exception.NotFoundException;
+import com.backend.brand_service.exception.AppException;
+import com.backend.brand_service.exception.ErrorCode;
 import com.backend.brand_service.mapper.BrandMapper;
 import com.backend.brand_service.repository.BrandRepository;
 import com.backend.brand_service.util.SlugUtil;
@@ -78,52 +78,56 @@ public class BrandService {
     // lấy 1 brand theo id
     public BrandResponse getBrandById(String id) {
         Brand brand = brandRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Thương hiệu không tìm thấy"));
+                .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
+
+        return BrandMapper.toResponse(brand);
+    }
+
+    // lấy 1 brand theo slug
+    public BrandResponse getBrandBySlug(String slug) {
+        Brand brand = brandRepository.findBySlug(slug)
+                .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
 
         return BrandMapper.toResponse(brand);
     }
 
     // tạo brand
-    public BrandResponse createBrand(BrandRequest request) {
+    public void createBrand(BrandRequest request) {
 
         if (brandRepository.existsByName(request.getName())) {
-            throw new ConflictException("Tên thương hiệu đã được sử dụng");
+            throw new AppException(ErrorCode.BRAND_NAME_EXISTS);
         }
 
         Brand brand = BrandMapper.toEntity(request);
         brand.setSlug(SlugUtil.toSlug(request.getName()));
 
         brandRepository.save(brand);
-
-        return BrandMapper.toResponse(brand);
     }
 
     // cập nhật brand
-    public BrandResponse updateBrand(String id, BrandRequest request) {
+    public void updateBrand(String id, BrandRequest request) {
 
         Brand brand = brandRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Thương hiệu không tìm thấy"));
+                .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
 
         brandRepository.findByName(request.getName())
                 .filter(b -> !b.getId().equals(id))
                 .ifPresent(b -> {
-                    throw new ConflictException("Tên thương hiệu đã được sử dụng");
+                    throw new AppException(ErrorCode.BRAND_NAME_EXISTS);
                 });
 
         BrandMapper.updateEntity(brand, request);
         brand.setSlug(SlugUtil.toSlug(brand.getName()));
 
         brand = brandRepository.save(brand);
-
-        return BrandMapper.toResponse(brand);
     }
 
     // cập nhật status
     @Transactional
-    public BrandResponse updateBrandStatus(String id, Integer status) {
+    public void updateBrandStatus(String id, Integer status) {
 
         Brand brand = brandRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Thương hiệu không tìm thấy"));
+                .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
 
         brand.setStatus(status);
         brandRepository.save(brand);
@@ -132,21 +136,18 @@ public class BrandService {
         if (Objects.equals(status, 0)) {
             productServiceClient.hideProductsByBrandInternal(id);
         }
-
-        return BrandMapper.toResponse(brand);
     }
 
     // xóa brand
     public void deleteBrand(String id) {
 
         Brand brand = brandRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Thương hiệu không tìm thấy"));
+                .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
 
         Boolean isUsed = productServiceClient.existsProductByBrandIdInternal(id);
 
         if (Boolean.TRUE.equals(isUsed)) {
-            throw new ConflictException(
-                    "Thương hiệu này không thể xóa vì đang được sử dụng bởi sản phẩm");
+            throw new AppException(ErrorCode.BRAND_IN_USE);
         }
 
         brandRepository.delete(brand);

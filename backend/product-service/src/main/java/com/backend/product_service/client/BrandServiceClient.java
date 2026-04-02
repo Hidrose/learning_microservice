@@ -19,4 +19,7 @@ public interface BrandServiceClient {
 
     @PostMapping("/api/brand/internal/brands")
     Map<String, BrandResponse> getBrandsByIdsInternal(@RequestBody List<String> ids);
+
+    @GetMapping("/api/brand/internal/slug/{slug}")
+    BrandResponse getBrandBySlugInternal(@PathVariable String slug);
 }

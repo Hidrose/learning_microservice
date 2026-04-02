@@ -13,18 +13,10 @@ import ListBody from "../list/ListBody";
 import useGetProducts from "../../../hooks/admin/product/useGetProducts";
 import useDeleteProduct from "../../../hooks/admin/product/useDeleteProduct";
 import useUpdateStatusProduct from "../../../hooks/admin/product/useUpdateStatusProduct";
-import toast from "react-hot-toast";
 
 function ProductList() {
-  const {
-    products,
-    isLoading,
-    totalItems,
-    totalPages,
-    currentPage,
-    limit,
-    mutate,
-  } = useGetProducts();
+  const { products, isLoading, totalItems, totalPages, currentPage, limit } =
+    useGetProducts();
   const { deleteProduct, isLoading: isLoadingDelete } = useDeleteProduct();
   const { updateStatusProduct, isLoading: isLoadingUpdate } =
     useUpdateStatusProduct();
@@ -49,13 +41,7 @@ function ProductList() {
       return;
     }
 
-    try {
-      await deleteProduct(id);
-      mutate();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
-      mutate();
-    }
+    await deleteProduct(id);
   };
 
   const handleUpdateStatus = async (id: string, status: number) => {
@@ -63,13 +49,7 @@ function ProductList() {
       return;
     }
 
-    try {
-      await updateStatusProduct(id, status);
-      mutate();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
-      mutate();
-    }
+    await updateStatusProduct(id, status);
   };
 
   return (
@@ -162,8 +142,8 @@ function ProductList() {
                       </div>
                     </td>
 
-                    <td className="p-[1rem]  ">{product.category.name}</td>
-                    <td className="p-[1rem]  ">{product.brand.name}</td>
+                    <td className="p-[1rem]  ">{product.categoryName}</td>
+                    <td className="p-[1rem]  ">{product.brandName}</td>
 
                     <td className="p-[1rem]  ">
                       {product.status === 1

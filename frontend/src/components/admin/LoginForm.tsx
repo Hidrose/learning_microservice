@@ -4,15 +4,12 @@ import { HiOutlineEyeOff, HiOutlineEye } from "react-icons/hi";
 import Loading from "../ui/Loading";
 import Overplay from "./ui/Overplay";
 import useLogin from "../../hooks/auth/useLogin";
-import toast from "react-hot-toast";
-import useGetAccount from "../../hooks/auth/useGetAccount";
+
 function LoginForm() {
   const [data, setData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const { handleLogin, isLoading } = useLogin();
-
-  const { isLoading: isLoadingAccount, mutate } = useGetAccount("customer");
 
   const toggleShowPassword = () => {
     setShowPassword((prev) => !prev);
@@ -28,23 +25,15 @@ function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      await handleLogin({
-        email: data.email,
-        password: data.password,
-      });
+    await handleLogin({
+      email: data.email,
+      password: data.password,
+    });
 
-      await mutate();
-
-      toast.success("Đăng nhập thành công");
-
-      setData({
-        email: "",
-        password: "",
-      });
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
-    }
+    setData({
+      email: "",
+      password: "",
+    });
   };
 
   return (
@@ -133,7 +122,7 @@ function LoginForm() {
         </div>
       </section>
 
-      {(isLoading || isLoadingAccount) && (
+      {isLoading && (
         <Overplay>
           <Loading height={0} size={55} color="white" thickness={8} />
           <h4 className="text-white">Vui lòng chờ trong giây lát ...</h4>

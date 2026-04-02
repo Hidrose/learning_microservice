@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class ImageProductResponse {
     private String id;
     private String image;
+    private Integer displayOrder;
 }

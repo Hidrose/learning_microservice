@@ -3,17 +3,20 @@ import "swiper/css";
 import "swiper/css/free-mode";
 import { FreeMode } from "swiper/modules";
 import ProductCard from "./ProductCard";
-import type { ProductResponse } from "../../../types/type";
+import type { ProductListItemResponse } from "../../../types/type";
 import { memo } from "react";
 import ProductSliderSkeleton from "../skeleton/ProductSliderSkeleton";
 
 interface Props {
   title: string;
   isLoading?: boolean;
-  products: ProductResponse[];
+  products: ProductListItemResponse[];
 }
 
 function ProductSlider({ title, isLoading = false, products }: Props) {
+  if (!isLoading && products.length === 0) {
+    return null;
+  }
   return (
     <>
       <section className="mb-[40px] px-[15px] text-black">

@@ -18,134 +18,172 @@ import com.backend.product_service.entity.Product;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, String> {
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        Page<Product> findByNameContainingIgnoreCaseAndStatus(
-                        String name,
-                        Integer status,
-                        Pageable pageable);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    Page<Product> findByNameContainingIgnoreCaseAndStatus(
+            String name,
+            Integer status,
+            Pageable pageable);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        Page<Product> findByNameContainingIgnoreCase(
-                        String name,
-                        Pageable pageable);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    Page<Product> findByNameContainingIgnoreCase(
+            String name,
+            Pageable pageable);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        Page<Product> findByStatus(
-                        Integer status,
-                        Pageable pageable);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    Page<Product> findByStatus(
+            Integer status,
+            Pageable pageable);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        Page<Product> findByStatusAndNameContainingIgnoreCase(
-                        Integer status,
-                        String name,
-                        Pageable pageable);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    Page<Product> findByStatusAndNameContainingIgnoreCase(
+            Integer status,
+            String name,
+            Pageable pageable);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        List<Product> findByStatus(
-                        Integer status,
-                        Sort sort);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    List<Product> findByStatus(
+            Integer status,
+            Sort sort);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        List<Product> findByStatusAndTotalSoldGreaterThan(
-                        Integer status,
-                        Integer totalSold,
-                        Sort sort);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    List<Product> findByStatusAndTotalSoldGreaterThan(
+            Integer status,
+            Integer totalSold,
+            Sort sort);
 
-        boolean existsByName(String name);
+    boolean existsByName(String name);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        Optional<Product> findByIdAndStatus(String id, int i);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    Optional<Product> findByIdAndStatus(String id, int i);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        Optional<Product> findByName(String name);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    Optional<Product> findByName(String name);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        Page<Product> findByStatusAndCategoryId(
-                        int status,
-                        String categoryId,
-                        Pageable pageable);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    Page<Product> findByStatusAndCategoryId(
+            int status,
+            String categoryId,
+            Pageable pageable);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        Page<Product> findByStatusAndCategoryIdAndNameContainingIgnoreCase(
-                        int status,
-                        String categoryId,
-                        String name,
-                        Pageable pageable);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    Page<Product> findByStatusAndCategoryIdAndNameContainingIgnoreCase(
+            int status,
+            String categoryId,
+            String name,
+            Pageable pageable);
 
-        boolean existsByBrandId(String brandId);
+    boolean existsByBrandId(String brandId);
 
-        boolean existsByCategoryId(String categoryId);
+    boolean existsByCategoryId(String categoryId);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        List<Product> findByStatusAndCategoryId(
-                        Integer status,
-                        String categoryId,
-                        Sort sort);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    List<Product> findByStatusAndCategoryId(
+            Integer status,
+            String categoryId,
+            Sort sort);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        List<Product> findByStatusAndBrandId(
-                        Integer status,
-                        String brandId,
-                        Sort sort);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    List<Product> findByStatusAndBrandId(
+            Integer status,
+            String brandId,
+            Sort sort);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        List<Product> findByIdInAndStatus(List<String> ids, Integer status);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    List<Product> findByIdIn(List<String> ids);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        Page<Product> findByStatusAndDiscountGreaterThan(
-                        Integer status,
-                        BigDecimal discount,
-                        Pageable pageable);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    Page<Product> findByStatusAndDiscountGreaterThan(
+            Integer status,
+            BigDecimal discount,
+            Pageable pageable);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        Page<Product> findByStatusAndDiscountGreaterThanAndNameContainingIgnoreCase(
-                        Integer status,
-                        BigDecimal discount,
-                        String name,
-                        Pageable pageable);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    Page<Product> findByStatusAndDiscountGreaterThanAndNameContainingIgnoreCase(
+            Integer status,
+            BigDecimal discount,
+            String name,
+            Pageable pageable);
 
-        Page<Product> findByStatusAndTotalSoldGreaterThan(Integer status, Integer totalSold, Pageable pageable);
+    Page<Product> findByStatusAndTotalSoldGreaterThan(Integer status, Integer totalSold, Pageable pageable);
 
-        Page<Product> findByStatusAndTotalSoldGreaterThanAndNameContainingIgnoreCase(
-                        Integer status, Integer totalSold, String name, Pageable pageable);
+    Page<Product> findByStatusAndTotalSoldGreaterThanAndNameContainingIgnoreCase(
+            Integer status, Integer totalSold, String name, Pageable pageable);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        List<Product> findTop10ByStatusOrderByCreatedAtDesc(int status);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    List<Product> findTop10ByStatusOrderByCreatedAtDesc(int status);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        Optional<Product> findBySlugAndStatus(String slug, int status);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    Optional<Product> findBySlugAndStatus(String slug, int status);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        @Query("""
-                            SELECT p FROM Product p
-                            WHERE p.status = 1
-                              AND LOWER(p.name) LIKE LOWER(CONCAT('%', :q, '%'))
-                        """)
-        List<Product> searchActiveProducts(
-                        @Param("q") String q,
-                        Pageable pageable);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    @Query("""
+                SELECT p FROM Product p
+                WHERE p.status = 1
+                  AND LOWER(p.name) LIKE LOWER(CONCAT('%', :q, '%'))
+            """)
+    List<Product> searchActiveProducts(
+            @Param("q") String q,
+            Pageable pageable);
 
-        @Modifying
-        @Query("""
-                            UPDATE Product p
-                            SET p.status = :status
-                            WHERE p.brandId = :brandId
-                        """)
-        int updateStatusByBrandId(String brandId, Integer status);
+    @Modifying
+    @Query("""
+                UPDATE Product p
+                SET p.status = :status
+                WHERE p.brandId = :brandId
+            """)
+    int updateStatusByBrandId(String brandId, Integer status);
 
-        @Modifying
-        @Query("""
-                            UPDATE Product p
-                            SET p.status = :status
-                            WHERE p.categoryId = :categoryId
-                        """)
-        int updateStatusByCategoryId(String categoryId, Integer status);
+    @Modifying
+    @Query("""
+                UPDATE Product p
+                SET p.status = :status
+                WHERE p.categoryId = :categoryId
+            """)
+    int updateStatusByCategoryId(String categoryId, Integer status);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        @Override
-        Optional<Product> findById(String id);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    @Override
+    Optional<Product> findById(String id);
 
-        @EntityGraph(attributePaths = { "images", "specifications" })
-        @Override
-        Page<Product> findAll(Pageable pageable);
+    @EntityGraph(attributePaths = { "images", "specifications" })
+    @Override
+    Page<Product> findAll(Pageable pageable);
+
+    // assistant
+    @Query("""
+            SELECT p FROM Product p
+            WHERE p.status = 1
+
+            AND (:keyword IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
+
+            AND (:category IS NULL OR p.categoryId = :category)
+
+            AND (:brand IS NULL OR p.brandId = :brand)
+
+            AND (:minPrice IS NULL OR p.finalPrice >= :minPrice)
+            AND (:maxPrice IS NULL OR p.finalPrice <= :maxPrice)
+
+            AND (:inStock IS NULL OR
+                (:inStock = true AND p.stock > 0) OR
+                (:inStock = false AND p.stock = 0)
+            )
+
+            AND (:isDiscount IS NULL OR
+                (:isDiscount = true AND p.discount > 0)
+            )
+
+            ORDER BY
+                CASE WHEN :isBestseller = true THEN p.totalSold END DESC,
+                p.createdAt DESC
+            """)
+    List<Product> queryProducts(
+            String keyword,
+            String category,
+            String brand,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Boolean inStock,
+            Boolean isDiscount,
+            Boolean isBestseller,
+            Pageable pageable);
 }

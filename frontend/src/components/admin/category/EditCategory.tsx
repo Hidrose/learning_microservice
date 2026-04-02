@@ -19,18 +19,18 @@ function EditCategory() {
   const [openViewer, setOpenViewer] = useState(false);
   const [viewerImage, setViewerImage] = useState<string>("");
 
-  const { category, isLoading, mutate } = useGetCategory(id as string);
+  const { category, isLoading } = useGetCategory(id as string);
   const { updateCategory, isLoading: isLoadingUpdate } = useUpdateCategory(
     id as string,
   );
 
   const {
     previewImages,
-    selectedFiles,
-    setPreviewImages,
-    setSelectedFiles,
+    getOrderedFiles,
     handlePreviewImage,
     handleRemovePreviewImage,
+    handleReorder,
+    clearImages,
   } = useInputImage(1);
 
   const handleOpenViewer = (image: string) => {
@@ -66,20 +66,17 @@ function EditCategory() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const orderedFiles = getOrderedFiles();
 
-    try {
-      await updateCategory({
+    await updateCategory(
+      {
         name: data.name.trim(),
-        image: selectedFiles[0],
         status: Number(data.status),
-      });
+      },
+      orderedFiles[0],
+    );
 
-      mutate();
-      setPreviewImages([]);
-      setSelectedFiles([]);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message);
-    }
+    clearImages();
   };
 
   return (
@@ -95,6 +92,7 @@ function EditCategory() {
                 previewImages={previewImages}
                 onPreviewImage={handlePreviewImage}
                 onRemovePreviewImage={handleRemovePreviewImage}
+                onReorderImages={handleReorder}
                 blockIndex={0}
               />
 

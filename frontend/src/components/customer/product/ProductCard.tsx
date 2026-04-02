@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import Image from "../../ui/Image";
-import type { ProductResponse } from "../../../types/type";
+import type { ProductListItemResponse } from "../../../types/type";
 
 interface Props {
-  product: ProductResponse;
+  product: ProductListItemResponse;
 }
 function ProductCard({ product }: Props) {
   return (
@@ -54,7 +54,7 @@ function ProductCard({ product }: Props) {
 
       <div className="space-y-[6px]">
         <p className="font-medium line-clamp-2">
-          {product.brand.name} - {product.category.name}
+          {product.brandName} - {product.categoryName}
         </p>
 
         <h5 className="font-medium capitalize line-clamp-2">{product.name}</h5>
