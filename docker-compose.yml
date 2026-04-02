@@ -142,8 +142,8 @@ services:
       DATASOURCE_URL: jdbc:mysql://mysql-44edd1f-lamdieuquang0105-f460.j.aivencloud.com:10104/paymentdb?ssl-mode=REQUIRED
       DATASOURCE_USERNAME: avnadmin
       DATASOURCE_PASSWORD: AVNS_YswmtLsflqLrvYnNU40
-      FRONTEND_URL: http://localhost:5173
-      BACKEND_URL: http://localhost:8090
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      BACKEND_URL: ${BACKEND_URL:-http://localhost:8090}
       MOMO_PARTNERCODE: MOMO
       MOMO_ACCESSKEY: F8BBA842ECF85
       MOMO_SECRETKEY: K951B6PE1waDMi640xX08PD3vg6EkVlz
@@ -215,7 +215,7 @@ services:
       - app-network
     environment:
       EUREKA_URL: http://eureka-server:8761/eureka
-      FRONTEND_URL: http://localhost:5173
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
       JAVA_TOOL_OPTIONS: "-Xms64m -Xmx192m"
     depends_on:
       eureka-server:
